@@ -1,0 +1,32 @@
+{
+  "name": "node-openbf-client",
+  "version": "1.0.0",
+  "description": "Main node.js client game repository, depends on the other repos",
+  "main": "node-openbf-client.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/node-openbf-project/node-openbf-client.git"
+  },
+  "keywords": [
+    "node",
+    "openbf",
+    "main",
+    "client"
+  ],
+  "author": "RepComm/Jon",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/node-openbf-project/node-openbf-client/issues"
+  },
+  "homepage": "https://github.com/node-openbf-project/node-openbf-client#readme",
+  "dependencies": {
+    "three": "^0.97.0"
+  },
+  "devDependencies": {
+    "electron": "^3.0.2"
+  }
+}
