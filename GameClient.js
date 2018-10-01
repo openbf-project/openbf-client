@@ -4,6 +4,8 @@ const Scene = THREE.Scene;
 const PerspectiveCamera = THREE.PerspectiveCamera;
 const WebGLRenderer = THREE.WebGLRenderer;
 
+let {BundleManager} = require("node-openbf-bundle");
+
 const LogicClock = require("./LogicClock.js");
 
 let elem = (id)=>document.getElementById(id);
@@ -33,6 +35,13 @@ class GameClient {
         this.clock = new LogicClock();
         this.clock.onUpdate = ()=>this.onUpdate();
         this.clock.start();
+
+        this.bundleManager = new BundleManager(this);
+        this.bundleManager.importBundles("./bundles", (bundles)=>{
+            for (let i=0; i<bundles.length; i++) {
+                bundles[i].onReady();
+            }
+        });
 
         window.addEventListener("resize", ()=>this.onResize());
     }
