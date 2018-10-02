@@ -32,7 +32,7 @@ class GameClient {
             500, //Far clip
         );
 
-        this.clock = new LogicClock();
+        this.clock = new LogicClock(30);
         this.clock.onUpdate = ()=>this.onUpdate();
         this.clock.start();
 
@@ -43,18 +43,22 @@ class GameClient {
             }
         });
 
+        this.secondTimer = 0;
+        this.frameRate = 0;
+        this.fps = 0;
+
         window.addEventListener("resize", ()=>this.onResize());
     }
 
     onUpdate () {
-        this.updates++;
-        this.frameRate++;
-        this.secondTimer += this.timeEnlapsed;
-        if (this.secondTimer >= this.resolutionPerSecond) {
+        this.secondTimer += this.clock.timeEnlapsed;
+        this.frameCounter++;
+        if (this.secondTimer >= this.clock.resolutionPerSecond) {
             this.secondTimer = 0;
-            this.frameRate = 0;
+            this.fps = this.frameCounter;
+            document.title = this.fps;
+            this.frameCounter = 0;
         }
-        
         this.renderer.render(this.currentScene, this.currentCamera);
     }
 
