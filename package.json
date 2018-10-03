@@ -25,6 +25,7 @@
   "homepage": "https://github.com/node-openbf-project/node-openbf-client#readme",
   "dependencies": {
     "node-openbf-bundle": "git+https://github.com/node-openbf-project/node-openbf-bundle.git",
+    "node-openbf-io": "git+https://github.com/node-openbf-project/node-openbf-io.git",
     "three": "^0.97.0"
   },
   "devDependencies": {
