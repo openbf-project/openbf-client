@@ -1,4 +1,7 @@
 
+let path = require("path");
+
+let {nodemsh} = require("node-openbf-io");
 let {Bundle} = require("node-openbf-bundle");
 
 class DefaultPlayer extends Bundle {
@@ -7,7 +10,16 @@ class DefaultPlayer extends Bundle {
     }
 
     onReady () {
-        console.log("Hello from DefaultPlayer bundle! I've loaded!");
+        console.log("[Bundle]", "DefaultPlayer", "Testing capabilities");
+
+        let parser = new nodemsh();
+
+        //Get the file's path within this module's directory
+        let f = path.join(__dirname, "imp_weap_inf_rifle.msh");
+
+        parser.parse(f, (result)=>{
+            console.log(result);
+        });
     }
 }
 

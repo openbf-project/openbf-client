@@ -4,7 +4,7 @@ const Scene = THREE.Scene;
 const PerspectiveCamera = THREE.PerspectiveCamera;
 const WebGLRenderer = THREE.WebGLRenderer;
 
-let {nodemsh, nodeter} = require("node-openbf-io");
+//let {nodemsh, nodeter} = require("node-openbf-io");
 let {BundleManager} = require("node-openbf-bundle");
 
 const LogicClock = require("./LogicClock.js");
@@ -51,10 +51,10 @@ class GameClient {
         window.addEventListener("resize", ()=>this.onResize());
 
         //Test nodemsh from node-openbf-io project
-        let parser = new nodemsh();
-        parser.parse("imp_weap_inf_rifle.msh", (result)=>{
-            console.log(result);
-        });
+        // let parser = new nodemsh();
+        // parser.parse("imp_weap_inf_rifle.msh", (result)=>{
+        //     console.log(result);
+        // });
     }
 
     onUpdate () {
