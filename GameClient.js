@@ -1,13 +1,15 @@
 
+const path = require("path");
+
 const THREE = require("three");
 const Scene = THREE.Scene;
 const PerspectiveCamera = THREE.PerspectiveCamera;
 const WebGLRenderer = THREE.WebGLRenderer;
 
-//let {nodemsh, nodeter} = require("node-openbf-io");
 let {BundleManager} = require("node-openbf-bundle");
 
 const LogicClock = require("./LogicClock.js");
+const Input = require("./input.js");
 
 let elem = (id)=>document.getElementById(id);
 let rect = (e)=>e.getBoundingClientRect();
@@ -28,10 +30,12 @@ class GameClient {
         //Three.js scene and camera code
         this.currentScene = new Scene();
         this.currentCamera = new PerspectiveCamera(
+            75,
             this.domRect.width / this.domRect.height, //Aspect ratio
-            0.01, //Near clip
+            0.1, //Near clip
             500, //Far clip
         );
+        this.currentCamera.position.z = 5;
 
         this.clock = new LogicClock(30);
         this.clock.onUpdate = ()=>this.onUpdate();
@@ -49,12 +53,7 @@ class GameClient {
         this.fps = 0;
 
         window.addEventListener("resize", ()=>this.onResize());
-
-        //Test nodemsh from node-openbf-io project
-        // let parser = new nodemsh();
-        // parser.parse("imp_weap_inf_rifle.msh", (result)=>{
-        //     console.log(result);
-        // });
+        this.inputManager = new Input(window.document);
     }
 
     onUpdate () {
@@ -65,6 +64,9 @@ class GameClient {
             this.fps = this.frameCounter;
             document.title = this.fps;
             this.frameCounter = 0;
+        }
+        for (let i=0; i<this.bundleManager.loadedBundles.length; i++) {
+            this.bundleManager.loadedBundles[i].onUpdate();
         }
         this.renderer.render(this.currentScene, this.currentCamera);
     }
