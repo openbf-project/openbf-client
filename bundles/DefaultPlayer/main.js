@@ -21,6 +21,8 @@ class DefaultPlayer extends Bundle {
         this.cameraYaw = new THREE.Object3D();
         this.cameraYaw.add(this.cameraPitch);
 
+        this.cameraLookingDirection = new THREE.Vector3();
+
         this.game.currentScene.add(this.cameraYaw);
 
         let cube = new THREE.Mesh(
@@ -71,16 +73,20 @@ class DefaultPlayer extends Bundle {
             this.cameraPitch.rotation.x -= this.game.inputManager.mouse.ydelta * 0.002;
         }
 
+        this.game.currentCamera.getWorldDirection(this.cameraLookingDirection);
+        //console.log(this.cameraLookingDirection);
+
         if (this.game.inputManager.isKeyDown("w")) {
-            this.cameraYaw.position.z -= 0.1;
+            //this.cameraYaw.position.z -= 0.1;
+            this.cameraYaw.position.add(this.cameraLookingDirection);
         } else if (this.game.inputManager.isKeyDown("s")) {
-            this.cameraYaw.position.z += 0.1;
+            this.cameraYaw.position.sub(this.cameraLookingDirection);
         }
-        if (this.game.inputManager.isKeyDown("a")) {
-            this.cameraYaw.position.x -= 0.1;
-        } else if (this.game.inputManager.isKeyDown("d")) {
-            this.cameraYaw.position.x += 0.1;
-        }
+        // if (this.game.inputManager.isKeyDown("a")) {
+        //     this.cameraYaw.position.x -= 0.1;
+        // } else if (this.game.inputManager.isKeyDown("d")) {
+        //     this.cameraYaw.position.x += 0.1;
+        // }
     }
 }
 
