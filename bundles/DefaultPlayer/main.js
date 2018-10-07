@@ -32,6 +32,14 @@ class DefaultPlayer extends Bundle {
             })
         );
         this.game.currentScene.add(cube);
+        document.addEventListener("click", ()=>{
+            this.game.inputManager.lockMouse(this.game.renderer.domElement);
+        });
+        document.addEventListener("keyup", (evt)=>{
+            if (evt.code === "Escape") {
+                this.game.inputManager.unlockMouse();
+            }
+        });
 
         //Create an MSH file parser
         /*let parser = new nodemsh();
@@ -51,14 +59,22 @@ class DefaultPlayer extends Bundle {
             console.log(this.game, this.game.inputManager);
             return;
         }
-        if (this.game.inputManager.isKeyPressed("w")) {
+        
+        if (this.game.inputManager.mouse.isLocked) {
+            this.game.currentCamera.rotation.y -= this.game.inputManager.mouse.xdelta * 0.001;
+        }
+        if (this.game.inputManager.mouse.isLocked) {
+            this.game.currentCamera.rotation.x -= this.game.inputManager.mouse.ydelta * 0.001;
+        }
+
+        if (this.game.inputManager.isKeyDown("w")) {
             this.game.currentCamera.position.z -= 0.1;
-        } else if (this.game.inputManager.isKeyPressed("s")) {
+        } else if (this.game.inputManager.isKeyDown("s")) {
             this.game.currentCamera.position.z += 0.1;
         }
-        if (this.game.inputManager.isKeyPressed("a")) {
+        if (this.game.inputManager.isKeyDown("a")) {
             this.game.currentCamera.position.x -= 0.1;
-        } else if (this.game.inputManager.isKeyPressed("d")) {
+        } else if (this.game.inputManager.isKeyDown("d")) {
             this.game.currentCamera.position.x += 0.1;
         }
     }

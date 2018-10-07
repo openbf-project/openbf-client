@@ -1,5 +1,5 @@
 
-const path = require("path");
+const electron = require("electron");
 
 const THREE = require("three");
 const Scene = THREE.Scene;
@@ -7,9 +7,9 @@ const PerspectiveCamera = THREE.PerspectiveCamera;
 const WebGLRenderer = THREE.WebGLRenderer;
 
 let {BundleManager} = require("node-openbf-bundle");
+let {InputManager} = require("node-openbf-utils");
 
 const LogicClock = require("./LogicClock.js");
-const Input = require("./input.js");
 
 let elem = (id)=>document.getElementById(id);
 let rect = (e)=>e.getBoundingClientRect();
@@ -37,6 +37,10 @@ class GameClient {
         );
         this.currentCamera.position.z = 5;
 
+        this.inputManager = new InputManager();
+        this.inputManager.listenToKeysOn(document);
+        this.inputManager.listenToMouseOn(this.renderer.domElement);
+
         this.clock = new LogicClock(30);
         this.clock.onUpdate = ()=>this.onUpdate();
         this.clock.start();
@@ -53,7 +57,6 @@ class GameClient {
         this.fps = 0;
 
         window.addEventListener("resize", ()=>this.onResize());
-        this.inputManager = new Input(window.document);
     }
 
     onUpdate () {
@@ -69,6 +72,9 @@ class GameClient {
             this.bundleManager.loadedBundles[i].onUpdate();
         }
         this.renderer.render(this.currentScene, this.currentCamera);
+
+        //Fixes the xdelta ydelta not getting updated problem
+        this.inputManager.setMousePosOOP(electron.screen.getCursorScreenPoint());
     }
 
     onResize () {

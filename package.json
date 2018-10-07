@@ -26,6 +26,7 @@
   "dependencies": {
     "node-openbf-bundle": "git+https://github.com/node-openbf-project/node-openbf-bundle.git",
     "node-openbf-io": "git+https://github.com/node-openbf-project/node-openbf-io.git",
+    "node-openbf-utils": "git+https://github.com/node-openbf-project/node-openbf-utils.git",
     "three": "^0.97.0"
   },
   "devDependencies": {
