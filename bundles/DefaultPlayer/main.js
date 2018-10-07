@@ -22,6 +22,11 @@ class DefaultPlayer extends Bundle {
         this.cameraYaw.add(this.cameraPitch);
 
         this.cameraLookingDirection = new THREE.Vector3();
+        this.cameraPosY = 0;
+
+        this.cameraRightOfLooking = new THREE.Vector3();
+        this.VEC_RIGHT = new THREE.Vector3(0, 1, 0);
+        this.radOf90 = THREE.Math.degToRad(90);
 
         this.game.currentScene.add(this.cameraYaw);
 
@@ -71,22 +76,38 @@ class DefaultPlayer extends Bundle {
         if (this.game.inputManager.mouse.isLocked) {
             this.cameraYaw.rotation.y -= this.game.inputManager.mouse.xdelta * 0.002;
             this.cameraPitch.rotation.x -= this.game.inputManager.mouse.ydelta * 0.002;
+            if (this.cameraPitch.rotation.x < -1) {
+                this.cameraPitch.rotation.x = -1;
+            } else if (this.cameraPitch.rotation.x > 1) {
+                this.cameraPitch.rotation.x = 1;
+            }
         }
 
         this.game.currentCamera.getWorldDirection(this.cameraLookingDirection);
         //console.log(this.cameraLookingDirection);
 
         if (this.game.inputManager.isKeyDown("w")) {
-            //this.cameraYaw.position.z -= 0.1;
             this.cameraYaw.position.add(this.cameraLookingDirection);
         } else if (this.game.inputManager.isKeyDown("s")) {
             this.cameraYaw.position.sub(this.cameraLookingDirection);
         }
-        // if (this.game.inputManager.isKeyDown("a")) {
-        //     this.cameraYaw.position.x -= 0.1;
-        // } else if (this.game.inputManager.isKeyDown("d")) {
-        //     this.cameraYaw.position.x += 0.1;
-        // }
+        if (this.game.inputManager.isKeyDown("a")) {
+            this.cameraRightOfLooking.set(
+                this.cameraLookingDirection.x,
+                0, //this.cameraLookingDirection.y,
+                this.cameraLookingDirection.z
+            );
+            this.cameraRightOfLooking.applyAxisAngle(this.VEC_RIGHT, this.radOf90);
+            this.cameraYaw.position.add(this.cameraRightOfLooking);
+        } else if (this.game.inputManager.isKeyDown("d")) {
+            this.cameraRightOfLooking.set(
+                this.cameraLookingDirection.x,
+                0, //this.cameraLookingDirection.y,
+                this.cameraLookingDirection.z
+            );
+            this.cameraRightOfLooking.applyAxisAngle(this.VEC_RIGHT, this.radOf90);
+            this.cameraYaw.position.sub(this.cameraRightOfLooking);
+        }
     }
 }
 
