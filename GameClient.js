@@ -35,7 +35,7 @@ class GameClient {
             0.1, //Near clip
             500, //Far clip
         );
-        this.currentCamera.position.z = 5;
+        this.currentCamera.position.z = 0;
 
         this.inputManager = new InputManager();
         this.inputManager.listenToKeysOn(document);

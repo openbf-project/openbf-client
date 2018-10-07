@@ -13,9 +13,15 @@ class DefaultPlayer extends Bundle {
     onReady () {
         console.log("[Bundle][DefaultPlayer] I loaded!");
 
-
         let light = new THREE.DirectionalLight( 0xffffff, 1.0 );
         this.game.currentScene.add(light);
+
+        this.cameraPitch = new THREE.Object3D();
+        this.cameraPitch.add(this.game.currentCamera);
+        this.cameraYaw = new THREE.Object3D();
+        this.cameraYaw.add(this.cameraPitch);
+
+        this.game.currentScene.add(this.cameraYaw);
 
         let cube = new THREE.Mesh(
             new THREE.BoxBufferGeometry(
@@ -61,21 +67,19 @@ class DefaultPlayer extends Bundle {
         }
         
         if (this.game.inputManager.mouse.isLocked) {
-            this.game.currentCamera.rotation.y -= this.game.inputManager.mouse.xdelta * 0.001;
-        }
-        if (this.game.inputManager.mouse.isLocked) {
-            this.game.currentCamera.rotation.x -= this.game.inputManager.mouse.ydelta * 0.001;
+            this.cameraYaw.rotation.y -= this.game.inputManager.mouse.xdelta * 0.002;
+            this.cameraPitch.rotation.x -= this.game.inputManager.mouse.ydelta * 0.002;
         }
 
         if (this.game.inputManager.isKeyDown("w")) {
-            this.game.currentCamera.position.z -= 0.1;
+            this.cameraYaw.position.z -= 0.1;
         } else if (this.game.inputManager.isKeyDown("s")) {
-            this.game.currentCamera.position.z += 0.1;
+            this.cameraYaw.position.z += 0.1;
         }
         if (this.game.inputManager.isKeyDown("a")) {
-            this.game.currentCamera.position.x -= 0.1;
+            this.cameraYaw.position.x -= 0.1;
         } else if (this.game.inputManager.isKeyDown("d")) {
-            this.game.currentCamera.position.x += 0.1;
+            this.cameraYaw.position.x += 0.1;
         }
     }
 }
