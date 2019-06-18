@@ -1,7 +1,9 @@
 
+//Requires
 const electron = require("electron");
-
+const cannon = require("cannon");
 const THREE = require("three");
+
 const Scene = THREE.Scene;
 const PerspectiveCamera = THREE.PerspectiveCamera;
 const WebGLRenderer = THREE.WebGLRenderer;
@@ -25,6 +27,9 @@ class GameClient {
             this.domRect.width,
             this.domRect.height
         );
+        this.renderer.setClearColor("#eeeeff");
+        this.renderer.shadowMap.enabled = true;
+	    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.domContainer.appendChild(this.renderer.domElement);
         
         //Three.js scene and camera code
@@ -35,7 +40,11 @@ class GameClient {
             0.1, //Near clip
             500, //Far clip
         );
+        
+        this.pworld = new cannon.World();
+        this.pworld.gravity.set(0, -9.82, 0);
 
+        //Input
         this.inputManager = new InputManager();
         this.inputManager.listenToKeysOn(document);
         this.inputManager.listenToMouseOn(this.renderer.domElement);
@@ -64,9 +73,13 @@ class GameClient {
         if (this.secondTimer >= this.clock.resolutionPerSecond) {
             this.secondTimer = 0;
             this.fps = this.frameCounter;
-            document.title = this.fps;
+            //document.title = this.fps;
             this.frameCounter = 0;
         }
+
+        let dt = (this.clock.timeNow - this.clock.timeLast);
+        this.pworld.step(1.0/this.clock.updatesPerSecond, dt, 3);//dt, 3);
+
         for (let i=0; i<this.bundleManager.loadedBundles.length; i++) {
             this.bundleManager.loadedBundles[i].onUpdate();
         }
