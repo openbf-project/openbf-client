@@ -3,6 +3,9 @@ This is the main project for openbf project.
 It contains the Electron app code responsible for harnessing
 the power of the other projects to run the game.
 
+Current State:
+https://www.youtube.com/watch?v=l9oMl0PgimI
+
 ## Installing as a user:
 Releases can be found in [the GitHub releases page](https://github.com/node-openbf-project/node-openbf-client/releases)
 The most recent release will appear as the first in the list.
@@ -39,6 +42,3 @@ When NPM says it is finished, you can run
 If you're using VSCode, you can click `Debug Start` instead.
 This is because a vscode launch.json file is included that defines
 the debug configurations pre-setup for you.
-
-# Structure planning:
-<img src="project-layout-current-inkscape_exported.svg" />
