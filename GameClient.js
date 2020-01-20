@@ -1,5 +1,4 @@
 
-//Requires
 const electron = require("electron");
 const cannon = require("cannon");
 const THREE = require("three");
@@ -80,13 +79,13 @@ class GameClient {
         let dt = (this.clock.timeNow - this.clock.timeLast);
         this.pworld.step(1.0/this.clock.updatesPerSecond, dt, 3);//dt, 3);
 
-        for (let i=0; i<this.bundleManager.loadedBundles.length; i++) {
-            this.bundleManager.loadedBundles[i].onUpdate();
+        for (let bundle of this.bundleManager.loadedBundles) {
+            bundle.onUpdate();
         }
         this.renderer.render(this.currentScene, this.currentCamera);
 
         //Fixes the xdelta ydelta not getting updated problem
-        this.inputManager.setMousePosOOP(electron.screen.getCursorScreenPoint());
+        this.inputManager.setMousePosOOP(electron.remote.screen.getCursorScreenPoint());
     }
 
     onResize () {

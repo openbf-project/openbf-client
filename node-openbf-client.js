@@ -15,7 +15,10 @@ function createWindow () {
         height:600,
         icon: path.join(__dirname, "icon.png"),
         show:false,
-        titleBarStyle: "hidden"
+        titleBarStyle: "hidden",
+        webPreferences: {
+            nodeIntegration: true
+        }
     });
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, "GameClient.html"),
