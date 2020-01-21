@@ -9,7 +9,9 @@ class Renderer {
     this.webgl.setClearColor("#eeeeff");
     this.webgl.setSize(100, 100);
     this.scene = new Scene();
-
+    this.camera;
+    
+    this.aspect = 1;
     this.needsRender = false;
     this.renderLoop = false;
 
@@ -23,13 +25,18 @@ class Renderer {
     parent.appendChild(this.webgl.domElement);
   }
 
+  setCamera (camera) {
+    this.camera = camera;
+  }
+
   resize (w, h) {
+    this.aspect = w/h;
     this.webgl.setSize(w, h);
   }
 
   render () {
     this.webgl.render(this.scene, this.camera);
-    this.needsRender = false;
+    //this.needsRender = false;
   }
 
   start () {

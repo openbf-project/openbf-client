@@ -2,6 +2,7 @@
 import Renderer from "./renderer/renderer.js";
 import { get, rect, on } from "./aliases.js";
 import Input from "./input/input.js";
+import TimeManager from "./clock/time.js";
 
 const cannon = require("cannon");
 
@@ -22,11 +23,15 @@ on(window, "resize", ()=>{
   renderer.resize(drawRect.width, drawRect.height);
 });
 
+let timeManager = new TimeManager();
+timeManager.start();
+
 let api = {
   input:input,
   renderer:renderer,
   physics:physics,
-  cannon:cannon
+  cannon:cannon,
+  timeManager:timeManager
 };
 
 let importModules = (cb)=> {

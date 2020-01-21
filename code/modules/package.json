@@ -7,6 +7,10 @@
         "freecam":{
             "desc":"A debug camera",
             "file":"freecam.js"
+        },
+        "default":{
+            "desc":"Default debug stuff for the scene",
+            "file":"default/default.js"
         }
     }
 }

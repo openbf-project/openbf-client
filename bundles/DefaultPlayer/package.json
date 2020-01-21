@@ -1,7 +1,0 @@
-{
-    "name": "defaultplayer",
-    "description": "A demo player module",
-    "displayName": "Player Bundle",
-    "main": "main.js",
-    "class": "DefaultPlayer"
-}

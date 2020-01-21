@@ -1,7 +1,0 @@
-{
-    "name": "corellia-courtyard",
-    "description": "A demo addon map",
-    "displayName": "Corellia Courtyard",
-    "main": "main.js",
-    "class": "AddonMap"
-}
