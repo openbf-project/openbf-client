@@ -1,10 +1,12 @@
 
+import { Entity, TYPE_ENTITY_MAP } from "../entity.js";
+
 let three = require("three");
 let Object3D = three.Object3D;
 let Vector3 = three.Vector3;
 let PerspectiveCamera = three.PerspectiveCamera;
 
-export function register(api) {
+export function register(api, _modpath) {
   let freecam = new FreeCam(api);
   api.renderer.setCamera(freecam.camera);
   api.renderer.scene.add(freecam.yaw);
@@ -15,7 +17,7 @@ export function register(api) {
 class FreeCam {
   constructor(api) {
     this.api = api;
-    this.camera = new PerspectiveCamera(75, api.renderer.aspect, 1, 200);
+    this.camera = new PerspectiveCamera(75, api.renderer.aspect, 0.1, 200);
     this.pitchLowLimit = -1.5;
     this.pitchHighLimit = 1.5;
 
@@ -42,6 +44,12 @@ class FreeCam {
             this.api.input.unlock();
         }
     });
+
+    this.vecTracker = new Entity(0, 1, this.yaw.position);
+
+    this.vecTracker.track("x", TYPE_ENTITY_MAP.float);
+    this.vecTracker.track("y", TYPE_ENTITY_MAP.float);
+    this.vecTracker.track("z", TYPE_ENTITY_MAP.float);
   }
   update() {
     if (this.api.input.mouse.locked) {
@@ -79,5 +87,7 @@ class FreeCam {
       this.lookDirRight.applyAxisAngle(this.RIGHT, this.radRight);
       this.yaw.position.sub(this.lookDirRight);
     }
+
+    //console.log(this.vecTracker.getData());
   }
 }

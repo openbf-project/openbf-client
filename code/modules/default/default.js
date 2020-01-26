@@ -1,17 +1,38 @@
 
 let three = require("three");
+let AnimationMixer = three.AnimationMixer;
+import GLTFLoader from "../../GLTFLoader.js";
 
-export function register(api) {
+export function register(api, _modpath) {
   api.renderer.scene.add(
-    new three.DirectionalLight(0xffffff, 0.8)
+    new three.DirectionalLight(0xffffff, 1)
   );
   api.renderer.scene.add(
-    new three.AmbientLight(0xffffff, 0.2)
+    new three.AmbientLight(0xffffff, 1)
+  );
+  api.renderer.scene.add(
+    new three.PointLight(0xffffff, 1, 100)
   );
   
-  let tex = new three.TextureLoader().load("./code/modules/default/test.png");
+  let tex = new three.TextureLoader().load(_modpath + "/test.png");
   tex.magFilter = three.NearestFilter;
   tex.minFilter = three.LinearMipMapLinearFilter;
+
+  let fLoader = new GLTFLoader();
+  fLoader.load(_modpath + "/demo-map.glb", (gltf)=>{
+    api.renderer.scene.add(gltf.scene);
+    console.log(gltf);
+    let mixer = new AnimationMixer(gltf.scene);
+    gltf.animations.forEach((clip)=>{
+      mixer.clipAction(clip).play();
+    });
+
+    api.timeManager.listen(()=>{
+      mixer.update(api.timeManager.delta);
+    });
+  });
+
+
   let cube = new three.Mesh(
     new three.BoxBufferGeometry(
       2,
@@ -28,8 +49,8 @@ export function register(api) {
       transparent: true
     })
   );
-  api.renderer.scene.add(cube);
-  cube.position.set(0, 0, -5);
+  //api.renderer.scene.add(cube);
+  //cube.position.set(0, 0, -5);
   
   let ground = new three.Mesh(
     new three.BoxBufferGeometry(
@@ -42,6 +63,6 @@ export function register(api) {
     ),
     new three.MeshPhongMaterial({ color: 0x808080 })
   );
-  api.renderer.scene.add(ground);
-  ground.position.set(0, -4, 0);
+  //api.renderer.scene.add(ground);
+  //ground.position.set(0, -4, 0);
 }

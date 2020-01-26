@@ -2,8 +2,9 @@
 import Renderer from "./renderer/renderer.js";
 import { get, rect, on } from "./aliases.js";
 import Input from "./input/input.js";
-import TimeManager from "./clock/time.js";
+import TimeManager from "./time.js";
 
+const path = require("path");
 const cannon = require("cannon");
 
 let renderer = new Renderer();
@@ -26,6 +27,7 @@ on(window, "resize", ()=>{
 let timeManager = new TimeManager();
 timeManager.start();
 
+//TODO - move to class for editor help
 let api = {
   input:input,
   renderer:renderer,
@@ -34,9 +36,11 @@ let api = {
   timeManager:timeManager
 };
 
+let _modspath = "./code/modules";
+let _modpath;
 let importModules = (cb)=> {
   let result = new Array();
-  fetch("./code/modules/package.json").then((res)=>{
+  fetch(_modspath + "/package.json").then((res)=>{
     res.json().then((json)=>{
       let names = Object.keys(json.active);
       let def;
@@ -44,7 +48,13 @@ let importModules = (cb)=> {
         def = json.active[modName];
         if (def.file) {
           import("./modules/" + def.file).then((mod)=>{
-            if (mod.register) mod.register(api);
+            if (mod.register) {
+              let t = def.file.split(path.sep); //Path to array
+              t.pop(); //Remove file
+              t.join(path.sep); //Join path again
+              _modpath = _modspath + "/" + t;
+              mod.register(api, _modpath);
+            }
             cb(modName, mod);
           });
         } else {

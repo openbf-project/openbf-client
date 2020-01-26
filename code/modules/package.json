@@ -1,9 +1,5 @@
 {
     "active":{
-        "entity":{
-            "desc":"Reusable three3d renderable entities",
-            "file":"entity.js"
-        },
         "freecam":{
             "desc":"A debug camera",
             "file":"freecam.js"

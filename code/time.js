@@ -8,6 +8,9 @@ class TimeManager {
     this.loop = true;
     this.timer;
     this.fps = fps;
+    this.delta = 0;
+    this.lastTime = 0;
+    this.now = 0;
   }
 
   listen (cb) {
@@ -24,6 +27,9 @@ class TimeManager {
   }
 
   onTick () {
+    this.now = Date.now();
+    this.delta = (this.now - this.lastTime)/1000;
+    this.lastTime = this.now;
     for (let cb of this.updateCallbacks) {
       cb();
     }
