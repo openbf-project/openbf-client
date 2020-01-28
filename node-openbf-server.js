@@ -1,34 +1,17 @@
-
-import Renderer from "./renderer.js";
-import { get, rect, on } from "./aliases.js";
-import Input from "./input/input.js";
-import TimeManager from "./time.js";
-import API from "./api.js";
+import Input from "./code/input/input.js";
+import TimeManager from "./code/time.js";
+import API from "./code/api.js";
 
 const path = require("path");
 const cannon = require("cannon");
 
-let renderer = new Renderer();
-let input = new Input(window);
 let physics = new cannon.World();
 physics.gravity.set(0, -9.82, 0);
-
-let container = get("container");
-let drawRect = rect(container);
-
-renderer.mount(container);
-renderer.resize(drawRect.width, drawRect.height);
-renderer.start();
-
-on(window, "resize", ()=>{
-  drawRect = rect(container);
-  renderer.resize(drawRect.width, drawRect.height);
-});
 
 let timeManager = new TimeManager();
 timeManager.start();
 
-const api = new API(cannon, physics, renderer, timeManager, input);
+const api = new API(cannon, physics, undefined, timeManager, input);
 
 let _modspath = "./code/modules";
 let _modpath;

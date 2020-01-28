@@ -21,14 +21,24 @@ class Renderer {
     }
   }
 
+  /**Mount the renderer to a parent html element
+   * @param {HTMLElement} parent 
+   */
   mount (parent) {
     parent.appendChild(this.webgl.domElement);
   }
 
+  /**Set current rendering camera
+   * @param {import("three").Camera} camera 
+   */
   setCamera (camera) {
     this.camera = camera;
   }
 
+  /**Resize the canvas
+   * @param {Integer} w 
+   * @param {Integer} h 
+   */
   resize (w, h) {
     this.aspect = w/h;
     this.webgl.setSize(w, h);

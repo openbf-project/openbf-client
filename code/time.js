@@ -13,6 +13,9 @@ class TimeManager {
     this.now = 0;
   }
 
+  /**Listen to updates (game loop)
+   * @param {Function} cb callback
+   */
   listen (cb) {
     this.updateCallbacks.push(cb);
   }
