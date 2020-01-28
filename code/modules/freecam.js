@@ -1,5 +1,5 @@
 
-import { Entity, TYPE_ENTITY_MAP } from "../entity.js";
+import { Entity } from "../entity.js";
 
 let three = require("three");
 let Object3D = three.Object3D;
@@ -19,7 +19,10 @@ export function register(api, _modpath) {
 }
 
 class FreeCam {
+  /**@param {import("../api.js").default} api 
+   */
   constructor(api) {
+    /**@type {import("../api.js").default} */
     this.api = api;
     this.camera = new PerspectiveCamera(75, api.renderer.aspect, 0.1, 200);
     this.pitchLowLimit = -1.5;
@@ -49,11 +52,12 @@ class FreeCam {
         }
     });
 
-    this.vecTracker = new Entity(0, 1, this.yaw.position);
+    this.entity = api.entityManager.createEntity(0, 1, this.yaw.position);
 
-    this.vecTracker.track("x", TYPE_ENTITY_MAP.float);
-    this.vecTracker.track("y", TYPE_ENTITY_MAP.float);
-    this.vecTracker.track("z", TYPE_ENTITY_MAP.float);
+    this.entity
+      .track("x", Entity.TYPE_FLOAT)
+      .track("y", Entity.TYPE_FLOAT)
+      .track("z", Entity.TYPE_FLOAT);
   }
   update() {
     if (this.api.input.mouse.locked) {
@@ -92,6 +96,6 @@ class FreeCam {
       this.yaw.position.sub(this.lookDirRight);
     }
 
-    //console.log(this.vecTracker.getData());
+    //console.log(this.entity.getData());
   }
 }

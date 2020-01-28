@@ -4,6 +4,7 @@ import { get, rect, on } from "./aliases.js";
 import Input from "./input/input.js";
 import TimeManager from "./time.js";
 import API from "./api.js";
+import { EntityManager } from "./entity.js";
 
 const path = require("path");
 const cannon = require("cannon");
@@ -27,8 +28,13 @@ on(window, "resize", ()=>{
 
 let timeManager = new TimeManager();
 timeManager.start();
+timeManager.listen(()=>{
+  physics.step(timeManager.delta);
+});
 
-const api = new API(cannon, physics, renderer, timeManager, input);
+let entityManager = new EntityManager();
+
+const api = new API(cannon, physics, renderer, timeManager, input, entityManager);
 
 let _modspath = "./code/modules";
 let _modpath;
