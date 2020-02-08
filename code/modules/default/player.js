@@ -17,9 +17,15 @@ export default class Player {
     this.name = name;
     this.isLocal = isLocal;
 
-    this.lookCamera = new LookCamera(this.api);
-    this.lookCamera.pitch.position.y = 1;
-    this.lookCamera.camera.position.set(0, 0, 1);
+    //Threejs representation (may be reused for anything)
+    this.display = new Object3D();
+
+    if (this.isLocal) {
+      this.lookCamera = new LookCamera(this.api);
+      this.lookCamera.pitch.position.y = 1;
+      this.lookCamera.camera.position.set(0, 0, 1);
+      this.lookCamera.mount(this.display);
+    }
 
     this.walkForce = 100;
     this.jumpForce = 80;
@@ -30,18 +36,16 @@ export default class Player {
     this.VEC_RGT = new cannon.Vec3(this.walkForce, 0, 0);
     this.VEC_JMP = new cannon.Vec3(0, this.jumpForce, 0);
 
-    this.display = new Object3D();
     let mat = new cannon.Material("player");
     mat.friction = 0.0;
     this.physics = new cannon.Body({mass:5, fixedRotation:false, material:mat});
+    let size = new cannon.Vec3(0.5, 0.5, 0.5);
     let shape = new cannon.Sphere(0.5);
-    this.physics.position.set(0, 1, 0);
+    //let shape = new cannon.Box(size);
     this.physics.addShape(shape);
     this.physics.linearDamping = 0.95;
     api.world.addBody(this.physics);
     
-    this.lookCamera.mount(this.display);
-
     document.addEventListener("click", () => {
       this.api.input.tryLock(this.api.renderer.webgl.domElement);
     });
@@ -58,6 +62,13 @@ export default class Player {
 
     let tempId = 33;
     this.entity = this.api.entityManager.createEntity(tempId, 1, this);
+    console.log("Init");
+  }
+
+  teleport (x=0, y=0, z=0) {
+    this.display.position.set(x, y, z);
+    this.physics.position.copy(this.display.position);
+    this.physics.velocity.setZero();
   }
 
   update () {

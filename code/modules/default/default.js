@@ -25,6 +25,8 @@ export function register(api, _modpath) {
     new three.PointLight(0xffffff, 1, 100)
   );
   
+  let mixer;
+
   fLoader.load(_modpath + "/gfx/demo-map.glb", (gltf)=>{
     gltf.scene.traverse((child)=>{
       if (child.userData.collision) {
@@ -32,10 +34,39 @@ export function register(api, _modpath) {
         let shape;
         switch (collision.shape.type) {
           case "mesh":
-            shape = new cannon.Trimesh(
-              child.geometry.attributes.position.array,
-              child.geometry.index.array
-            );
+            if (collision.trimesh) {
+              shape = new cannon.Trimesh(
+                child.geometry.attributes.position.array,
+                child.geometry.index.array
+              );
+            } else {
+              let pos = child.geometry.attributes.position;
+              let cannonPos = new Array(pos.count);
+              let vi = 0;
+              for (let i=0; i<pos.array.length; i+=3) {
+                cannonPos[vi] = new cannon.Vec3(
+                  pos.array[i],
+                  pos.array[i+1],
+                  pos.array[i+2]
+                );
+                vi++;
+              }
+              
+              let index = child.geometry.index;
+              let cannonInd = new Array();
+              for (let i=0; i<index.count; i+=3) {
+                cannonInd.push([
+                  index.array[i],
+                  index.array[i+1],
+                  index.array[i+2]
+                ]);
+              }
+
+              shape = new cannon.ConvexPolyhedron(
+                cannonPos,
+                cannonInd
+              );
+            }
             break;
           case "sphere":
             shape = new cannon.Sphere(
@@ -53,10 +84,6 @@ export function register(api, _modpath) {
         body.real = child;
         body.addShape(shape);
         api.world.addBody(body);
-
-        if (collision.mass && collision.mass !== 0) {
-          updateBodies.push(body);
-        }
       }
       if (child.userData.hide) {
         child.visible = false;
@@ -68,17 +95,19 @@ export function register(api, _modpath) {
     gltf.animations.forEach((clip)=>{
       mixer.clipAction(clip).play();
     });
+
+    localPlayer.teleport(0, 5, 0);
+
   });
 
   let localPlayer = new Player(api, "RepComm", true);
+  localPlayer.teleport(0, 2, 0);
+  console.log(localPlayer);
   localPlayer.mount(api.renderer.scene, api.renderer);
 
   fLoader.load(_modpath + "/gfx/trooper.glb", (gltf)=>{
     localPlayer.lookCamera.yaw.add(gltf.scene);
   });
-
-  let updateBodies = new Array();
-  let mixer;
 
   api.timeManager.listen(()=>{
     localPlayer.update();
