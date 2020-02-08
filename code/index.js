@@ -30,6 +30,12 @@ let timeManager = new TimeManager();
 timeManager.start();
 timeManager.listen(()=>{
   physics.step(timeManager.delta);
+  physics.bodies.forEach((body)=>{
+    if (body.real) {
+      body.real.position.copy(body.position);
+      body.real.quaternion.copy(body.quaternion);
+    }
+  });
 });
 
 let entityManager = new EntityManager();
