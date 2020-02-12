@@ -42,6 +42,10 @@ class Renderer {
   resize (w, h) {
     this.aspect = w/h;
     this.webgl.setSize(w, h);
+    if (this.camera && this.camera.aspect) {
+      this.camera.aspect = this.aspect;
+      this.camera.updateProjectionMatrix();
+    }
   }
 
   render () {

@@ -12,6 +12,7 @@ import Player from "./player.js";
  * @param {String} _modpath path to this module not including last slash
  */
 export function register(api, _modpath) {
+  api.world.gravity.set(0, -9.82*2, 0);
   api.renderer.webgl.setClearColor("#112233");
   let fLoader = new GLTFLoader();
 
@@ -26,6 +27,8 @@ export function register(api, _modpath) {
   );
   
   let mixer;
+
+  let localPlayer = new Player(api, _modpath, "RepComm", true);
 
   fLoader.load(_modpath + "/gfx/demo-map.glb", (gltf)=>{
     gltf.scene.traverse((child)=>{
@@ -100,18 +103,12 @@ export function register(api, _modpath) {
 
   });
 
-  let localPlayer = new Player(api, "RepComm", true);
   localPlayer.teleport(0, 2, 0);
   console.log(localPlayer);
   localPlayer.mount(api.renderer.scene, api.renderer);
 
-  fLoader.load(_modpath + "/gfx/trooper.glb", (gltf)=>{
-    localPlayer.lookCamera.yaw.add(gltf.scene);
-  });
-
   api.timeManager.listen(()=>{
     localPlayer.update();
-
     if (mixer) mixer.update(api.timeManager.delta);
   });
 }

@@ -27,7 +27,7 @@ function createWindow () {
     }));
     mainWindow.maximize();
     mainWindow.show();
-    mainWindow.webContents.openDevTools();
+    //mainWindow.webContents.openDevTools();
     mainWindow.on("closed", function () {
         // Dereference the window object, usually you would store windows
         // in an array if your app supports multi windows, this is the time

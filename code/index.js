@@ -12,8 +12,6 @@ const cannon = require("cannon");
 let renderer = new Renderer();
 let input = new Input(window);
 let physics = new cannon.World();
-physics.gravity.set(0, -9.82, 0);
-
 let container = get("container");
 let drawRect = rect(container);
 
