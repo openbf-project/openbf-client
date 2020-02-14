@@ -1,4 +1,5 @@
 
+let fs = require("fs");
 let three = require("three");
 let cannon = require("cannon");
 
@@ -6,6 +7,7 @@ let AnimationMixer = three.AnimationMixer;
 import GLTFLoader from "../../GLTFLoader.js";
 
 import Player from "./player.js";
+import { UILabel, UIButton } from "../../ui.js";
 
 /**Auxiliary register function for calling API/fetching resources/setup
  * @param {import("../../api.js").default} api api object containing references to apis
@@ -14,7 +16,7 @@ import Player from "./player.js";
 export function register(api, _modpath) {
   api.world.gravity.set(0, -9.82*2, 0);
   api.renderer.webgl.setClearColor("#112233");
-  let fLoader = new GLTFLoader();
+  let gltfLoader = new GLTFLoader();
 
   api.renderer.scene.add(
     new three.DirectionalLight(0xffffff, 1)
@@ -30,7 +32,29 @@ export function register(api, _modpath) {
 
   let localPlayer = new Player(api, _modpath, "RepComm", true);
 
-  fLoader.load(_modpath + "/gfx/demo-map.glb", (gltf)=>{
+  // fs.readFile(_modpath + "/gfx/demo-map.glb", (ex0, data)=>{
+  //   if (ex0) {
+  //     console.log("File System Error", ex0);
+  //     return;
+  //   }
+  //   gltfLoader.parse(data.buffer , _modpath + "/gfx/demo-map.glb", (gltf)=>{
+  //     console.log(gltf);
+  //   }, (ex1)=>{
+  //     console.log("Formatting Error", ex1);
+  //   });
+  // });
+
+  let deltaDisplay = new UILabel("FPS : ");
+  deltaDisplay.mount(api.renderer.hud);
+  let playerPos = new UILabel("xyz : (0, 0, 0)");
+  playerPos.mount(api.renderer.hud);
+
+  let btn = new UIButton("Jump").onclick(()=>{
+    localPlayer.physics.applyLocalImpulse(localPlayer.VEC_JMP, cannon.Vec3.ZERO);
+  });
+  btn.mount(api.renderer.hud);
+
+  gltfLoader.load(_modpath + "/gfx/demo-map.glb", (gltf)=>{
     gltf.scene.traverse((child)=>{
       if (child.userData.collision) {
         let collision = JSON.parse(child.userData.collision);
@@ -104,10 +128,11 @@ export function register(api, _modpath) {
   });
 
   localPlayer.teleport(0, 2, 0);
-  console.log(localPlayer);
   localPlayer.mount(api.renderer.scene, api.renderer);
 
   api.timeManager.listen(()=>{
+    deltaDisplay.text = "Logic FPS : " + api.timeManager.avgfps;
+    playerPos.text = `Position : (${localPlayer.x.toFixed(2)}, ${localPlayer.y.toFixed(2)}, ${localPlayer.z.toFixed(2)})`;
     localPlayer.update();
     if (mixer) mixer.update(api.timeManager.delta);
   });

@@ -5,6 +5,7 @@ import Input from "./input/input.js";
 import TimeManager from "./time.js";
 import API from "./api.js";
 import { EntityManager } from "./entity.js";
+import { UIManager, UIPanel } from "./ui.js";
 
 const path = require("path");
 const cannon = require("cannon");
@@ -14,8 +15,12 @@ let input = new Input(window);
 let physics = new cannon.World();
 let container = get("container");
 let drawRect = rect(container);
+let ui = new UIManager(container);
 
-renderer.mount(container);
+//Add the renderer to our UI
+ui.add(renderer);
+
+//TODO - drawRect should be size of its own container
 renderer.resize(drawRect.width, drawRect.height);
 renderer.start();
 
@@ -38,7 +43,7 @@ timeManager.listen(()=>{
 
 let entityManager = new EntityManager();
 
-const api = new API(cannon, physics, renderer, timeManager, input, entityManager);
+const api = new API(cannon, physics, renderer, timeManager, input, entityManager, ui);
 
 let _modspath = "./code/modules";
 let _modpath;

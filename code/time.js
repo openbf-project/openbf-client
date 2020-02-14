@@ -2,7 +2,7 @@
 let { Clock } = require("three");
 
 class TimeManager {
-  constructor (fps=20) {
+  constructor (fps=60) {
     this.clock = new Clock(true);
     this.updateCallbacks = new Array();
     this.loop = true;
@@ -11,6 +11,10 @@ class TimeManager {
     this.delta = 0;
     this.lastTime = 0;
     this.now = 0;
+
+    this.secondCounter = 0;
+    this.fpsCounter = 0;
+    this.avgfps = 0;
   }
 
   /**Listen to updates (game loop)
@@ -22,7 +26,8 @@ class TimeManager {
 
   start () {
     this.stop();
-    this.timer = setInterval(()=>this.onTick(), this.fps);
+    this.frameTime = 1000/this.fps;
+    this.timer = setInterval(()=>this.onTick(), this.frameTime);
   }
 
   stop () {
@@ -32,6 +37,13 @@ class TimeManager {
   onTick () {
     this.now = Date.now();
     this.delta = (this.now - this.lastTime)/1000;
+    this.secondCounter += this.delta;
+    this.fpsCounter ++;
+    if (this.secondCounter >= 0.99) {
+      this.secondCounter = 0;
+      this.avgfps = this.fpsCounter;
+      this.fpsCounter = 0;
+    }
     this.lastTime = this.now;
     for (let cb of this.updateCallbacks) {
       cb();

@@ -52,8 +52,8 @@ export default class Player {
     this.VEC_JMP = new cannon.Vec3(0, this.jumpForce, 0);
 
     this.physics = new cannon.Body({
-      mass:10,
-      fixedRotation:false
+      mass: 10,
+      fixedRotation: false
     });
 
     let size = new cannon.Vec3(0.5, 0.5, 0.5);
@@ -62,7 +62,7 @@ export default class Player {
     this.physics.addShape(shape, new cannon.Vec3(0, 0.25, 0));
     this.physics.linearDamping = 0.1;
     api.world.addBody(this.physics);
-    
+
     document.addEventListener("click", () => {
       this.api.input.tryLock(this.api.renderer.webgl.domElement);
     });
@@ -104,8 +104,8 @@ export default class Player {
     this.mixer;
 
     let fLoader = new GLTFLoader();
-    fLoader.load(_path + "/gfx/trooper.glb", (gltf)=>{
-      gltf.scene.traverse((child)=>{
+    fLoader.load(_path + "/gfx/trooper.glb", (gltf) => {
+      gltf.scene.traverse((child) => {
         child.frustumCulled = false;
       });
       this.lookCamera.yaw.add(gltf.scene);
@@ -119,35 +119,35 @@ export default class Player {
     });
   }
 
-  walk () {
+  walk() {
     this.lookCamera.pitch.position.y = this.viewHeightStand;
     this.lookCamera.camera.position.set(0, 0, 1.5);
     this.anim("walk", false);
     this.stanceState = this.STANCE_WALK;
   }
 
-  crouch () {
+  crouch() {
     this.lookCamera.pitch.position.y = this.viewHeightCrouch;
     this.lookCamera.camera.position.set(0, 0, 1);
     this.anim("crouch");
     this.stanceState = this.STANCE_CROUCH;
   }
 
-  prone () {
+  prone() {
     this.lookCamera.pitch.position.y = this.viewHeightProne;
     this.lookCamera.camera.position.set(0, 0, 0.5);
     this.anim("prone");
     this.stanceState = this.STANCE_PRONE;
   }
 
-  stand () {
+  stand() {
     this.lookCamera.pitch.position.y = this.viewHeightStand;
     this.lookCamera.camera.position.set(0, 0, 1.5);
     this.anim("stand");
     this.stanceState = this.STANCE_STAND;
   }
 
-  anim (name, fadein=false) {
+  anim(name, fadein = false) {
     this.currentClip = three.AnimationClip.findByName(this.animations, name);
     this.lastAction = this.currentAction;
     this.currentAction = this.mixer.clipAction(this.currentClip);
@@ -163,13 +163,13 @@ export default class Player {
     }
   }
 
-  teleport (x=0, y=0, z=0) {
+  teleport(x = 0, y = 0, z = 0) {
     this.display.position.set(x, y, z);
     this.physics.position.copy(this.display.position);
     this.physics.velocity.setZero();
   }
 
-  update () {
+  update() {
     if (this.isLocal) {
       this.physics.quaternion.copy(this.lookCamera.yaw.quaternion);
       this.lookCamera.update();
@@ -197,9 +197,22 @@ export default class Player {
    * @param {Object3D} parent
    * @param {Renderer} renderer
    */
-  mount(parent, renderer=undefined) {
+  mount(parent, renderer = undefined) {
     parent.add(this.display);
     if (this.isLocal) this.lookCamera.mountToRenderer(renderer);
+  }
+
+  /**@returns {Number} */
+  get x() {
+    return this.display.position.x;
+  }
+  /**@returns {Number} */
+  get y() {
+    return this.display.position.y;
+  }
+  /**@returns {Number} */
+  get z() {
+    return this.display.position.z;
   }
 }
 

@@ -1,14 +1,26 @@
 
-const three = require("three");
-let WebGLRenderer = three.WebGLRenderer;
-let Scene = three.Scene;
+import { UIPanel } from "./ui.js";
 
-class Renderer {
+const three = require("three");
+
+class Renderer extends UIPanel {
   constructor () {
-    this.webgl = new WebGLRenderer();
+    super();
+    //Create a threejs webgl renderer
+    this.webgl = new three.WebGLRenderer();
+    this.element.appendChild(this.webgl.domElement);
+
+    //Add a panel for Heads Up Display
+    this.hud = new UIPanel();
+    this.hud.mount(this);
+    //Absolute position it
+    this.hud.absolute = true;
+    this.hud.fill = "both";
+    this.hud.transparent = true;
+
     this.webgl.setClearColor("#eeeeff");
     this.webgl.setSize(100, 100);
-    this.scene = new Scene();
+    this.scene = new three.Scene();
     this.camera;
     
     this.aspect = 1;
@@ -19,13 +31,6 @@ class Renderer {
       if (this.needsRender && this.camera) this.render();
       if (this.renderLoop) requestAnimationFrame(this.renderCallback);
     }
-  }
-
-  /**Mount the renderer to a parent html element
-   * @param {HTMLElement} parent 
-   */
-  mount (parent) {
-    parent.appendChild(this.webgl.domElement);
   }
 
   /**Set current rendering camera
