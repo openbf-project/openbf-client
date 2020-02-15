@@ -1,5 +1,5 @@
 
-import { UIPanel } from "./ui.js";
+let { UIPanel } = require("./ui.js");
 
 const three = require("three");
 
@@ -69,4 +69,4 @@ class Renderer extends UIPanel {
   }
 }
 
-export default Renderer;
+module.exports = Renderer;

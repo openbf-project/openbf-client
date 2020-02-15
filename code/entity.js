@@ -1,5 +1,5 @@
 
-export class EntityManager {
+class EntityManager {
   constructor() {
     /**@type {Map<Integer, Entity>}*/
     this.entities = new Map();
@@ -15,7 +15,7 @@ export class EntityManager {
   }
 }
 
-export class Entity {
+class Entity {
   static TYPE_INT = 0;
   static TYPE_BOOL = 1;
   static TYPE_STRING = 2;
@@ -202,3 +202,5 @@ export class Entity {
     return this.data;
   }
 }
+
+module.exports = {EntityManager, Entity};

@@ -1,9 +1,9 @@
 
-let { Clock } = require("three");
+//import { Clock } from "three";
 
 class TimeManager {
   constructor (fps=60) {
-    this.clock = new Clock(true);
+    //this.clock = new Clock(true);
     this.updateCallbacks = new Array();
     this.loop = true;
     this.timer;
@@ -51,4 +51,4 @@ class TimeManager {
   }
 }
 
-export default TimeManager;
+module.exports = TimeManager;

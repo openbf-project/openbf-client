@@ -1,5 +1,5 @@
 
-class API {
+module.exports = class API {
   /**
    * @param {import("cannon")} cannon physics engine reference
    * @param {import("cannon").World} world physics world reference
@@ -17,7 +17,6 @@ class API {
     this.input = input;
     this.entityManager = entityManager;
     this.ui = ui;
+    this.headless = false;
   }
 }
-
-export default API;

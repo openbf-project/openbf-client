@@ -5,4 +5,4 @@ class Map {
   }
 }
 
-export default Map;
+module.exports = Map;

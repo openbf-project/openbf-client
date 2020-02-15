@@ -1,8 +1,7 @@
 
-import { Entity } from "../../entity.js";
-import LookCamera from "./lookcamera.js";
+let LookCamera = require("./lookcamera.js");
 
-export class FreeCam extends LookCamera {
+module.exports = class FreeCam extends LookCamera {
   /**@param {import("../../api.js").default} api 
    */
   constructor(api) {

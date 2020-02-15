@@ -1,5 +1,5 @@
 
-/**Heavily refactored to use ES Modules by Jonathan Crowder
+/**Heavily refactored to use modules/headless by Jonathan Crowder
  * @author Jonathan Crowder / https://github.com/RepComm
  * @author Rich Tibbett / https://github.com/richtr
  * @author mrdoob / http://mrdoob.com/
@@ -27,9 +27,14 @@ class GLTFRegistry {
   }
 }
 
-export default class GLTFLoader {
-  constructor(manager) {
-    this.manager = (manager !== undefined) ? manager : THREE.DefaultLoadingManager;
+class GLTFLoader {
+  constructor(manager, headless = false) {
+    this.headless = headless;
+    if (manager !== null && manager !== undefined) {
+      this.manager = manager;
+    } else {
+      this.manager = THREE.DefaultLoadingManager;
+    }
     this.dracoLoader = null;
   }
 
@@ -139,7 +144,8 @@ export default class GLTFLoader {
     let parser = new GLTFParser(json, extensions, {
       path: path || this.resourcePath || '',
       crossOrigin: this.crossOrigin,
-      manager: this.manager
+      manager: this.manager,
+      headless: this.headless
     });
     parser.parse((scene, scenes, cameras, animations, json) => {
       let glTF = {
@@ -1059,14 +1065,13 @@ class GLTFParser {
   constructor(json, extensions, options) {
     this.json = json || {};
     this.extensions = extensions || {};
-    this.options = options || {};
+    this.options = options || { headless: false };
     // loader object cache
     this.cache = new GLTFRegistry();
     // BufferGeometry caching
     this.primitiveCache = [];
     this.multiplePrimitivesCache = [];
     this.multiPassGeometryCache = [];
-
     this.textureLoader = new THREE.TextureLoader(this.options.manager);
     this.textureLoader.setCrossOrigin(this.options.crossOrigin);
 
@@ -1153,10 +1158,14 @@ class GLTFParser {
           dependency = this.loadBuffer(index);
           break;
         case 'material':
-          dependency = this.loadMaterial(index);
+          if (!this.options.headless) {
+            dependency = this.loadMaterial(index);
+          }
           break;
         case 'texture':
-          dependency = this.loadTexture(index);
+          if (!this.options.headless) {
+            dependency = this.loadTexture(index);
+          }
           break;
         case 'skin':
           dependency = this.loadSkin(index);
@@ -1165,7 +1174,9 @@ class GLTFParser {
           dependency = this.loadAnimation(index);
           break;
         case 'camera':
-          dependency = this.loadCamera(index);
+          if (!this.options.headless) {
+            dependency = this.loadCamera(index);
+          }
           break;
         default:
           throw new Error('Unknown type: ' + type);
@@ -1183,7 +1194,7 @@ class GLTFParser {
     let dependencies = this.cache.get(type);
     if (!dependencies) {
       let defs = this.json[type + (type === 'mesh' ? 'es' : 's')] || [];
-      dependencies = Promise.all(defs.map((def, index)=> {
+      dependencies = Promise.all(defs.map((def, index) => {
         return this.getDependency(type, index);
       }));
       this.cache.add(type, dependencies);
@@ -1268,7 +1279,7 @@ class GLTFParser {
       pendingBufferViews.push(this.getDependency('bufferView', accessorDef.sparse.indices.bufferView));
       pendingBufferViews.push(this.getDependency('bufferView', accessorDef.sparse.values.bufferView));
     }
-    return Promise.all(pendingBufferViews).then((bufferViews)=> {
+    return Promise.all(pendingBufferViews).then((bufferViews) => {
       let bufferView = bufferViews[0];
       let itemSize = WEBGL_TYPE_SIZES[accessorDef.type];
       let TypedArray = WEBGL_COMPONENT_TYPES[accessorDef.componentType];
@@ -1623,7 +1634,7 @@ class GLTFParser {
     return this.getMultiDependencies([
       'accessor',
       'material'
-    ]).then((dependencies)=> {
+    ]).then((dependencies) => {
       let primitives = meshDef.primitives;
       let originalMaterials = [];
       for (let i = 0, il = primitives.length; i < il; i++) {
@@ -1631,7 +1642,7 @@ class GLTFParser {
           ? createDefaultMaterial()
           : dependencies.materials[primitives[i].material];
       }
-      return this.loadGeometries(primitives).then((geometries)=> {
+      return this.loadGeometries(primitives).then((geometries) => {
         let isMultiMaterial = geometries.length === 1 && geometries[0].groups.length > 0;
         let meshes = [];
         for (let i = 0, il = geometries.length; i < il; i++) {
@@ -1945,3 +1956,5 @@ class GLTFParser {
     });
   }
 }
+
+module.exports = GLTFLoader;

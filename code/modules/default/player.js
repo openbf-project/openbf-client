@@ -4,10 +4,12 @@ let Object3D = three.Object3D;
 let AnimationMixer = three.AnimationMixer;
 let cannon = require("cannon");
 
-import GLTFLoader from "../../GLTFLoader.js";
-import LookCamera from "./lookcamera.js";
+let { Entity } = require("../../entity.js");
 
-export default class Player {
+let GLTFLoader = require("../../GLTFLoader.js");
+let LookCamera = require("./lookcamera.js");
+
+module.exports = class Player {
   name = "";
   /**@type {import("../../entity.js").Entity} */
   entity = undefined;
@@ -100,10 +102,13 @@ export default class Player {
 
     let tempId = 33;
     this.entity = this.api.entityManager.createEntity(tempId, 1, this);
+    console.log(this.entity);
+    this.entity.track("jumpForce", Entity.TYPE_INT);
     /**@type {AnimationMixer} */
     this.mixer;
 
-    let fLoader = new GLTFLoader();
+    let fLoader = new GLTFLoader(undefined, this.api.headless);
+    console.log(fLoader);
     fLoader.load(_path + "/gfx/trooper.glb", (gltf) => {
       gltf.scene.traverse((child) => {
         child.frustumCulled = false;
@@ -215,5 +220,3 @@ export default class Player {
     return this.display.position.z;
   }
 }
-
-

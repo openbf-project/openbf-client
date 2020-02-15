@@ -1,6 +1,6 @@
-import { on } from "../aliases.js";
+let { on } = require("./aliases");
 
-class Input {
+module.exports = class Input {
   /**@param {HTMLElement} element 
    */
   constructor(element) {
@@ -65,5 +65,3 @@ class Input {
     document.exitPointerLock();
   }
 }
-
-export default Input;

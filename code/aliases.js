@@ -14,4 +14,4 @@ let make = (type) => document.createElement(type);
  */
 let on = (elem, type, callback, options) => elem.addEventListener(type, callback, options);
 
-export {get, getByClass, rect, make, on};
+module.exports = {get, getByClass, rect, make, on};

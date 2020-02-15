@@ -4,7 +4,7 @@ let Object3D = three.Object3D;
 let Vector3 = three.Vector3;
 let PerspectiveCamera = three.PerspectiveCamera;
 
-export default class LookCamera {
+module.exports = class LookCamera {
   constructor (api) {
     this.api = api;
     this.camera = new PerspectiveCamera(75, api.renderer.aspect, 0.1, 200);
@@ -26,17 +26,6 @@ export default class LookCamera {
 
     this.pitchLowLimit = -1.5;
     this.pitchHighLimit = 1.5;
-
-    /**
-     * document.addEventListener("click", () => {
-      this.api.input.tryLock(this.api.renderer.webgl.domElement);
-    });
-    document.addEventListener("keyup", (evt) => {
-        if (evt.code === "Escape") {
-            this.api.input.unlock();
-        }
-    });
-     */
   }
 
   update () {

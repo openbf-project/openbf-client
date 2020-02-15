@@ -4,17 +4,16 @@
  * @param {ElementCreationOptions} options
  * @returns {HTMLElement}
  */
-export function make (type, options) {
+function make (type, options) {
   return document.createElement(type, options);
 }
-
 /**Alias for element.addEventListener
  * @param {HTMLElement} element 
  * @param {String} type 
  * @param {EventListenerOrEventListenerObject} callback 
  * @param {boolean | AddEventListenerOptions} options 
  */
-export function on (element, type, callback, options) {
+function on (element, type, callback, options) {
   element.addEventListener(type, callback, options);
 }
 
@@ -22,11 +21,11 @@ export function on (element, type, callback, options) {
  * @param {String} id of html element
  * @returns {HTMLElement}
  */
-export function get (id) {
+function get (id) {
   return document.getElementById(id);
 }
 
-export class UIManager {
+class UIManager {
   constructor (root) {
     this.root = root;
   }
@@ -42,12 +41,11 @@ export class UIManager {
   }
 }
 
-export class UIComponent {
+class UIComponent {
   /**@param {HTMLElement} element 
    */
   constructor (element) {
     this.element = element;
-    console.log(this.element);
     this.element.reference = this;
     this.element.classList.add("ui");
   }
@@ -140,14 +138,14 @@ export class UIComponent {
   }
 }
 
-export class UIPanel extends UIComponent {
+class UIPanel extends UIComponent {
   constructor () {
     super(make("div"));
     this.element.classList.add("panel");
   }
 }
 
-export class UIButton extends UIComponent {
+class UIButton extends UIComponent {
   constructor (text="button") {
     super(make("button"));
     this.element.classList.add("button", "bg");
@@ -159,7 +157,7 @@ export class UIButton extends UIComponent {
   }
 }
 
-export class UILabel extends UIComponent {
+class UILabel extends UIComponent {
   constructor (text="label") {
     super(make("label"));
     this.element.classList.add("label");
@@ -170,3 +168,5 @@ export class UILabel extends UIComponent {
     this.element.textContent = txt;
   }
 }
+
+module.exports = {make, on, get,UIManager,UIComponent,UIPanel,UIButton,UILabel};

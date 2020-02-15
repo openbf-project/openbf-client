@@ -1,13 +1,13 @@
 
-import Renderer from "./renderer.js";
-import { get, rect, on } from "./aliases.js";
-import Input from "./input/input.js";
-import TimeManager from "./time.js";
-import API from "./api.js";
-import { EntityManager } from "./entity.js";
-import { UIManager, UIPanel } from "./ui.js";
+let path = require("path");
+let Renderer = require("./renderer.js");
+let { get, rect, on } = require("./aliases.js");
+let Input = require("./input.js");
+let TimeManager = require("./time.js");
+let API = require("./api.js");
+let { EntityManager } = require("./entity.js");
+let { UIManager, UIPanel } = require("./ui.js");
 
-const path = require("path");
 const cannon = require("cannon");
 
 let renderer = new Renderer();
@@ -44,6 +44,7 @@ timeManager.listen(()=>{
 let entityManager = new EntityManager();
 
 const api = new API(cannon, physics, renderer, timeManager, input, entityManager, ui);
+api.headless = false;
 
 let _modspath = "./code/modules";
 let _modpath;
@@ -56,21 +57,19 @@ let importModules = (cb)=> {
       for (let modName of names) {
         def = json.active[modName];
         if (def.file) {
-          import("./modules/" + def.file).then((mod)=>{
-            if (mod.register) {
-              let t = def.file.split(path.sep); //Path to array
-              t.pop(); //Remove file
-              t.join(path.sep); //Join path again
-              _modpath = _modspath + "/" + t;
-              mod.register(api, _modpath);
-            }
+          let mod = require("./modules/" + def.file);
+          if (mod.register) {
+            let t = def.file.split(path.sep); //Path to array
+            t.pop(); //Remove file
+            t.join(path.sep); //Join path again
+            _modpath = _modspath + "/" + t;
+            mod.register(api, _modpath);
             cb(modName, mod);
-          });
+          }
         } else {
           console.log(modName, "module not loaded, no file attribute.");
         }
       }
-      cb(result);
     });
   });
 }
