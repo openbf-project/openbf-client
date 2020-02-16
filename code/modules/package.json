@@ -1,5 +1,11 @@
 {
     "active":{
+        "zombie-demo":{
+            "desc":"Pre-alpha zombie demo!",
+            "file":"zombie-demo/index.js"
+        }
+    },
+    "inactive":{
         "default":{
             "desc":"Default debug stuff for the scene",
             "file":"default/default.js"

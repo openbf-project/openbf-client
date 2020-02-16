@@ -68,7 +68,7 @@ let udpPort = 10209;
 let udpServer = udp.createSocket("udp4");
 udpServer.on("error", (error) => {
   console.error("[UDP Server] " + error);
-  server.close();
+  udpServer.close();
 });
 udpServer.on("message", (buffer, info) => {
   console.log("[UDP Server] Msg: " + buffer.toString());

@@ -68,36 +68,36 @@ module.exports = class Player {
     document.addEventListener("click", () => {
       this.api.input.tryLock(this.api.renderer.webgl.domElement);
     });
-    document.addEventListener("keydown", (evt) => {
-      if (evt.key === "w") {
-        if (this.stanceState === this.STANCE_STAND) {
-          this.walk();
-        }
-      } else if (evt.code === "Space") {
-        if (this.stanceState === this.STANCE_STAND || this.stanceState === this.STANCE_WALK) {
-          this.stand();
-          this.physics.applyLocalImpulse(this.VEC_JMP, cannon.Vec3.ZERO);
-        } else if (this.stanceState === this.STANCE_CROUCH) {
-          this.stand();
-        } else if (this.stanceState === this.STANCE_PRONE) {
-          this.crouch();
-        }
-      }
-    });
+    // document.addEventListener("keydown", (evt) => {
+    //   if (evt.key === "w") {
+    //     if (this.stanceState === this.STANCE_STAND) {
+    //       this.walk();
+    //     }
+    //   } else if (evt.code === "Space") {
+    //     if (this.stanceState === this.STANCE_STAND || this.stanceState === this.STANCE_WALK) {
+    //       this.stand();
+    //       this.physics.applyLocalImpulse(this.VEC_JMP, cannon.Vec3.ZERO);
+    //     } else if (this.stanceState === this.STANCE_CROUCH) {
+    //       this.stand();
+    //     } else if (this.stanceState === this.STANCE_PRONE) {
+    //       this.crouch();
+    //     }
+    //   }
+    // });
     document.addEventListener("keyup", (evt) => {
       if (evt.code === "Escape") {
         this.api.input.unlock();
-      } else if (evt.key === "c") {
-        if (this.stanceState === this.STANCE_STAND) {
-          this.crouch();
-        } else if (this.stanceState === this.STANCE_CROUCH) {
-          this.prone();
-        } else if (this.stanceState === this.STANCE_PRONE) {
-          this.crouch();
-        }
-      } else if (evt.key === "w") {
-        this.stand();
-      }
+      } //else if (evt.key === "c") {
+      //   if (this.stanceState === this.STANCE_STAND) {
+      //     this.crouch();
+      //   } else if (this.stanceState === this.STANCE_CROUCH) {
+      //     this.prone();
+      //   } else if (this.stanceState === this.STANCE_PRONE) {
+      //     this.crouch();
+      //   }
+      // } else if (evt.key === "w") {
+      //   this.stand();
+      // }
     });
 
     let tempId = 33;
@@ -107,21 +107,21 @@ module.exports = class Player {
     /**@type {AnimationMixer} */
     this.mixer;
 
-    let fLoader = new GLTFLoader(undefined, this.api.headless);
-    console.log(fLoader);
-    fLoader.load(_path + "/gfx/trooper.glb", (gltf) => {
-      gltf.scene.traverse((child) => {
-        child.frustumCulled = false;
-      });
-      this.lookCamera.yaw.add(gltf.scene);
-      this.mixer = new AnimationMixer(gltf.scene);
-      this.animations = gltf.animations;
+    // let fLoader = new GLTFLoader(undefined, this.api.headless);
+    // console.log(fLoader);
+    // fLoader.load(_path + "/gfx/trooper.glb", (gltf) => {
+    //   gltf.scene.traverse((child) => {
+    //     child.frustumCulled = false;
+    //   });
+    //   this.lookCamera.yaw.add(gltf.scene);
+    //   this.mixer = new AnimationMixer(gltf.scene);
+    //   this.animations = gltf.animations;
 
-      //this.stand();
-      this.currentClip = three.AnimationClip.findByName(this.animations, "stand");
-      this.currentAction = this.mixer.clipAction(this.currentClip);
-      this.currentAction.play();
-    });
+    //   //this.stand();
+    //   this.currentClip = three.AnimationClip.findByName(this.animations, "stand");
+    //   this.currentAction = this.mixer.clipAction(this.currentClip);
+    //   this.currentAction.play();
+    // });
   }
 
   walk() {
