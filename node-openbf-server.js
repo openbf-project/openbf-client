@@ -10,29 +10,24 @@ let path = require("path");
 let cannon = require("cannon");
 let fs = require("fs");
 
-let physics = new cannon.World();
-physics.gravity.set(0, -9.82, 0);
+const api = new API();
+api.cannon = cannon;
 
-let timeManager = new TimeManager();
-timeManager.start();
+api.world = new cannon.World();
+api.world.gravity.set(0, -9.82, 0);
 
-let entityManager = new EntityManager();
+api.renderer = {scene:new three.Scene()};
 
-const api = new API(
-  cannon,
-  physics,
-  {scene:new three.Scene()},
-  timeManager,
-  undefined,
-  entityManager,
-  undefined
-);
+api.timeManager = new TimeManager();
+api.timeManager.start();
+
+api.entityManager = new EntityManager();
+
 api.headless = true;
 
 let _modspath = "./code/modules";
 let _modpath;
 let importModules = (cb) => {
-  let result = new Array();
   let json = JSON.parse(
     fs.readFileSync(_modspath + "/package.json").toString()
   );

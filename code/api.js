@@ -1,22 +1,23 @@
 
 module.exports = class API {
-  /**
-   * @param {import("cannon")} cannon physics engine reference
-   * @param {import("cannon").World} world physics world reference
-   * @param {import("./renderer.js").default} renderer for rendering things, obviously
-   * @param {import("./time.js").default} timeManager for managing game loop/scheduling
-   * @param {import("./input/input.js").default} input for getting game input
-   * @param {import("./entity.js").EntityManager} entityManager for Entity Networking
-   * @param {import("./ui.js").UIManager} ui for Interface management
-   */
-  constructor (cannon, world, renderer, timeManager, input, entityManager, ui) {
-    this.cannon = cannon;
-    this.world = world;
-    this.renderer = renderer;
-    this.timeManager = timeManager;
-    this.input = input;
-    this.entityManager = entityManager;
-    this.ui = ui;
+  constructor () {
+    /**@type {import("cannon")} cannon physics engine reference*/
+    this.cannon;
+    /**@type {import("cannon").World} physics world reference*/
+    this.world;
+    /**@type {import("./renderer.js")} for rendering things*/
+    this.renderer;
+    /**@type {import("./time.js")} for managing game loop/scheduling*/
+    this.timeManager;
+    /**@type {import("./input.js")} for getting game input*/
+    this.input;
+    /**@type {import("./entity.js").EntityManager} entityManager for networking*/
+    this.entityManager;
+    /**@type {import("./ui.js").UIManager} for Interface management*/
+    this.ui;
+    /**@type {import("./state.js").StateManager} for auto-updating StateInstances */
+    this.stateManager;
+    /**Client = false, Server = true */
     this.headless = false;
   }
 }

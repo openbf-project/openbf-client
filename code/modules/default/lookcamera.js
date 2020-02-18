@@ -7,7 +7,7 @@ let PerspectiveCamera = three.PerspectiveCamera;
 module.exports = class LookCamera {
   constructor (api) {
     this.api = api;
-    this.camera = new PerspectiveCamera(75, api.renderer.aspect, 0.1, 200);
+    this.camera = new PerspectiveCamera(75, api.renderer.aspect, 0.1, 500);
 
     this.pitch = new Object3D();
     this.yaw = new Object3D();

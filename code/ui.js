@@ -7,6 +7,8 @@
 function make (type, options) {
   return document.createElement(type, options);
 }
+module.exports.make = make;
+
 /**Alias for element.addEventListener
  * @param {HTMLElement} element 
  * @param {String} type 
@@ -16,6 +18,7 @@ function make (type, options) {
 function on (element, type, callback, options) {
   element.addEventListener(type, callback, options);
 }
+module.exports.on = on;
 
 /**Alias for document.getElementById
  * @param {String} id of html element
@@ -24,6 +27,7 @@ function on (element, type, callback, options) {
 function get (id) {
   return document.getElementById(id);
 }
+module.exports.get = get;
 
 class UIManager {
   constructor (root) {
@@ -40,6 +44,7 @@ class UIManager {
     return component;
   }
 }
+module.exports.UIManager = UIManager;
 
 class UIComponent {
   /**@param {HTMLElement} element 
@@ -137,8 +142,9 @@ class UIComponent {
     }
   }
 }
+module.exports.UIComponent = UIComponent;
 
-class UIPanel extends UIComponent {
+module.exports.UIPanel = class UIPanel extends UIComponent {
   constructor () {
     super(make("div"));
     this.element.classList.add("panel");
@@ -156,6 +162,7 @@ class UIButton extends UIComponent {
     this.element.textContent = txt;
   }
 }
+module.exports.UIButton = UIButton;
 
 class UILabel extends UIComponent {
   constructor (text="label") {
@@ -168,5 +175,4 @@ class UILabel extends UIComponent {
     this.element.textContent = txt;
   }
 }
-
-module.exports = {make, on, get,UIManager,UIComponent,UIPanel,UIButton,UILabel};
+module.exports.UILabel = UILabel;

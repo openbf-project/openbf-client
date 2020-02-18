@@ -6,45 +6,55 @@ let Input = require("./input.js");
 let TimeManager = require("./time.js");
 let API = require("./api.js");
 let { EntityManager } = require("./entity.js");
-let { UIManager, UIPanel } = require("./ui.js");
+let { UIManager } = require("./ui.js");
+let { StateManager } = require("./state.js");
 
 const cannon = require("cannon");
+const three = require("three");
 
-let renderer = new Renderer();
-let input = new Input(window);
-let physics = new cannon.World();
+const api = new API();
+api.cannon = cannon;
+
+api.world = new cannon.World();
+
+api.renderer = {scene:new three.Scene()};
+
+api.timeManager = new TimeManager();
+api.timeManager.start();
+
+api.entityManager = new EntityManager();
+
+api.stateManager = new StateManager();
+
+api.headless = false;
+
+api.renderer = new Renderer();
+api.input = new Input(window);
+
 let container = get("container");
 let drawRect = rect(container);
-let ui = new UIManager(container);
+api.ui = new UIManager(container);
 
 //Add the renderer to our UI
-ui.add(renderer);
+api.ui.add(api.renderer);
 
-//TODO - drawRect should be size of its own container
-renderer.resize(drawRect.width, drawRect.height);
-renderer.start();
+api.renderer.resize(drawRect.width, drawRect.height);
+api.renderer.start();
 
 on(window, "resize", ()=>{
   drawRect = rect(container);
-  renderer.resize(drawRect.width, drawRect.height);
+  api.renderer.resize(drawRect.width, drawRect.height);
 });
 
-let timeManager = new TimeManager();
-timeManager.start();
-timeManager.listen(()=>{
-  physics.step(timeManager.delta);
-  physics.bodies.forEach((body)=>{
+api.timeManager.listen(()=>{
+  api.world.step(api.timeManager.delta);
+  api.world.bodies.forEach((body)=>{
     if (body.real) {
       body.real.position.copy(body.position);
       body.real.quaternion.copy(body.quaternion);
     }
   });
 });
-
-let entityManager = new EntityManager();
-
-const api = new API(cannon, physics, renderer, timeManager, input, entityManager, ui);
-api.headless = false;
 
 let _modspath = "./code/modules";
 let _modpath;

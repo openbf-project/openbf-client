@@ -14,6 +14,7 @@ class EntityManager {
     return e;
   }
 }
+module.exports.EntityManager = EntityManager;
 
 class Entity {
   static TYPE_INT = 0;
@@ -202,5 +203,4 @@ class Entity {
     return this.data;
   }
 }
-
-module.exports = {EntityManager, Entity};
+module.exports.Entity = Entity;
