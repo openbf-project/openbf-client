@@ -6,7 +6,7 @@
   "scripts": {
     "start": "electron .",
     "test": "test",
-    "server":"node ./node-openbf-server.js"
+    "server": "node ./node-openbf-server.js"
   },
   "repository": {
     "type": "git",
@@ -26,8 +26,7 @@
   "homepage": "https://github.com/node-openbf-project/node-openbf-client#readme",
   "dependencies": {
     "cannon": "^0.6.2",
-    "electron": "^7.1.9",
-    "node-openbf-io": "git+https://github.com/node-openbf-project/node-openbf-io.git",
+    "electron": "^7.3.2",
     "three": "^0.97.0"
   },
   "devDependencies": {}

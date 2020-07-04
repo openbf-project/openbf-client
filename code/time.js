@@ -4,6 +4,7 @@
 class TimeManager {
   constructor (fps=60) {
     //this.clock = new Clock(true);
+    /**@type {Array<updateCallback>}*/
     this.updateCallbacks = new Array();
     this.loop = true;
     this.timer;
@@ -18,20 +19,25 @@ class TimeManager {
   }
 
   /**Listen to updates (game loop)
-   * @param {Function} cb callback
+   * @param {updateCallback} cb callback
+   * @callback updateCallback
+   * @param {number} delta
    */
   listen (cb) {
     this.updateCallbacks.push(cb);
+    return this;
   }
 
   start () {
     this.stop();
     this.frameTime = 1000/this.fps;
     this.timer = setInterval(()=>this.onTick(), this.frameTime);
+    return this;
   }
 
   stop () {
     if (this.timer !== undefined) clearInterval(this.timer);
+    return this;
   }
 
   onTick () {
@@ -46,7 +52,7 @@ class TimeManager {
     }
     this.lastTime = this.now;
     for (let cb of this.updateCallbacks) {
-      cb();
+      cb(this.delta);
     }
   }
 }

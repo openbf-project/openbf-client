@@ -37,7 +37,13 @@ class GLTFLoader {
     }
     this.dracoLoader = null;
   }
-
+  /**Load a gltf file
+   * @param {string} url 
+   * @param {onLoadCallback} onLoad
+   * @param {onProgressCallback} onProgress 
+   * @param {onErrorCallback} onError
+   * @callback onProgressCallback
+   */
   load(url, onLoad, onProgress, onError) {
     let resourcePath;
     if (this.resourcePath !== undefined) {
@@ -90,6 +96,17 @@ class GLTFLoader {
     this.dracoLoader = dracoLoader;
     return this;
   }
+  /**Parse an arraybuffer
+   * @param {ArrayBuffer} data 
+   * @param {string} path 
+   * @param {onLoadCallback} onLoad
+   * @param {onErrorCallback} onError 
+   * 
+   * @callback onLoadCallback
+   * @param {ThreeGLTFModel} model
+   * @callback onErrorCallback
+   * @param {string|Error} error
+   */
   parse(data, path, onLoad, onError) {
     let content;
     let extensions = {};

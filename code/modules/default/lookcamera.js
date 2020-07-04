@@ -4,9 +4,14 @@ let Object3D = three.Object3D;
 let Vector3 = three.Vector3;
 let PerspectiveCamera = three.PerspectiveCamera;
 
+const API = require("../../api.js");
+const api = API.get();
+
+//TODO - lots
+
 module.exports = class LookCamera {
-  constructor (api) {
-    this.api = api;
+  constructor () {
+    api = api;
     this.camera = new PerspectiveCamera(75, api.renderer.aspect, 0.1, 500);
 
     this.pitch = new Object3D();
@@ -29,10 +34,10 @@ module.exports = class LookCamera {
   }
 
   update () {
-    if (this.api.input.mouse.locked) {
-      this.yaw.rotation.y -= this.api.input.mouse.movementX * this.sensitivity;
-      this.pitch.rotation.x -= this.api.input.mouse.movementY * this.sensitivity;
-      this.api.input.consumeMovement();
+    if (api.input.mouse.locked) {
+      this.yaw.rotation.y -= api.input.mouse.movementX * this.sensitivity;
+      this.pitch.rotation.x -= api.input.mouse.movementY * this.sensitivity;
+      api.input.consumeMovement();
       if (this.pitch.rotation.x < this.pitchLowLimit) {
         this.pitch.rotation.x = this.pitchLowLimit;
       } else if (this.pitch.rotation.x > this.pitchHighLimit) {

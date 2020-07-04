@@ -1,21 +1,22 @@
 
 let LookCamera = require("./lookcamera.js");
 
+const API = require("../../api.js");
+const api = API.get();
+
 module.exports = class FreeCam extends LookCamera {
-  /**@param {import("../../api.js").default} api 
-   */
-  constructor(api) {
-    super(api);
+  constructor() {
+    super();
     
-    this.mount(api.renderer.scene);
-    this.mountToRenderer(api.renderer);
+    this.mount(api.getRenderer().getScene());
+    this.mountToRenderer(api.getRenderer());
 
     document.addEventListener("click", () => {
-      this.api.input.tryLock(this.api.renderer.webgl.domElement);
+      api.input.tryLock(api.getRenderer().webgl.domElement);
     });
     document.addEventListener("keyup", (evt) => {
         if (evt.code === "Escape") {
-            this.api.input.unlock();
+            api.input.unlock();
         }
     });
 
@@ -29,12 +30,12 @@ module.exports = class FreeCam extends LookCamera {
   update() {
     this.camera.getWorldDirection(this.lookDir);
     this.lookDir.multiplyScalar(0.3);
-    if (this.api.input.getKey("w")) {
+    if (api.input.getKey("w")) {
       this.yaw.position.add(this.lookDir);
-    } else if (this.api.input.getKey("s")) {
+    } else if (api.input.getKey("s")) {
       this.yaw.position.sub(this.lookDir);
     }
-    if (this.api.input.getKey("a")) {
+    if (api.input.getKey("a")) {
       this.lookDirRight.set(
         this.lookDir.x,
         0, //this.cameraLookingDirection.y,
@@ -42,7 +43,7 @@ module.exports = class FreeCam extends LookCamera {
       );
       this.lookDirRight.applyAxisAngle(this.RIGHT, this.radRight);
       this.yaw.position.add(this.lookDirRight);
-    } else if (this.api.input.getKey("d")) {
+    } else if (api.input.getKey("d")) {
       this.lookDirRight.set(
         this.lookDir.x,
         0, //this.cameraLookingDirection.y,

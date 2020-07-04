@@ -1,65 +1,45 @@
 
 let path = require("path");
-let Renderer = require("./renderer.js");
-let { get, rect, on } = require("./aliases.js");
-let Input = require("./input.js");
+let Renderer = require("./ui/renderer.js");
+let { get, on } = require("./aliases.js");
 let TimeManager = require("./time.js");
 let API = require("./api.js");
-let { EntityManager } = require("./entity.js");
-let { UIManager } = require("./ui.js");
 let { StateManager } = require("./state.js");
 
+const Component = require("./ui/component.js");
+
 const cannon = require("cannon");
-const three = require("three");
 
-const api = new API();
-api.cannon = cannon;
+const api = API.get();
+api.setPhysicsEngine(cannon);
 
-api.world = new cannon.World();
+api.setRenderer(new Renderer());
 
-api.renderer = {scene:new three.Scene()};
+api.setTimeManager(new TimeManager().start());
 
-api.timeManager = new TimeManager();
-api.timeManager.start();
+api.setStateManager (new StateManager());
 
-api.entityManager = new EntityManager();
+api.setHeadless(false);
 
-api.stateManager = new StateManager();
+let container = new Component()
+  .useNative(get("container"));
 
-api.headless = false;
+api.getRenderer().mount(container);
 
-api.renderer = new Renderer();
-api.input = new Input(window);
-
-let container = get("container");
-let drawRect = rect(container);
-api.ui = new UIManager(container);
-
-//Add the renderer to our UI
-api.ui.add(api.renderer);
-
-api.renderer.resize(drawRect.width, drawRect.height);
+api.renderer.resize(container.rect.width, container.rect.height);
 api.renderer.start();
 
 on(window, "resize", ()=>{
-  drawRect = rect(container);
-  api.renderer.resize(drawRect.width, drawRect.height);
+  api.renderer.resize(container.rect.width, container.rect.height);
 });
 
-api.timeManager.listen(()=>{
-  api.world.step(api.timeManager.delta);
-  api.world.bodies.forEach((body)=>{
-    if (body.real) {
-      body.real.position.copy(body.position);
-      body.real.quaternion.copy(body.quaternion);
-    }
-  });
+api.getTimeManager().listen((delta)=>{
+  if (api.hasWorld()) api.getWorld().update(delta);
 });
 
 let _modspath = "./code/modules";
 let _modpath;
 let importModules = (cb)=> {
-  let result = new Array();
   fetch(_modspath + "/package.json").then((res)=>{
     res.json().then((json)=>{
       let names = Object.keys(json.active);
@@ -73,7 +53,7 @@ let importModules = (cb)=> {
             t.pop(); //Remove file
             t.join(path.sep); //Join path again
             _modpath = _modspath + "/" + t;
-            mod.register(api, _modpath);
+            mod.register(_modpath);
             cb(modName, mod);
           }
         } else {
