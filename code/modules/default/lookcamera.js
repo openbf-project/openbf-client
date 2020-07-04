@@ -7,11 +7,8 @@ let PerspectiveCamera = three.PerspectiveCamera;
 const API = require("../../api.js");
 const api = API.get();
 
-//TODO - lots
-
 module.exports = class LookCamera {
   constructor () {
-    api = api;
     this.camera = new PerspectiveCamera(75, api.renderer.aspect, 0.1, 500);
 
     this.pitch = new Object3D();
@@ -33,23 +30,45 @@ module.exports = class LookCamera {
     this.pitchHighLimit = 1.5;
   }
 
-  update () {
-    if (api.input.mouse.locked) {
-      this.yaw.rotation.y -= api.input.mouse.movementX * this.sensitivity;
-      this.pitch.rotation.x -= api.input.mouse.movementY * this.sensitivity;
-      api.input.consumeMovement();
-      if (this.pitch.rotation.x < this.pitchLowLimit) {
-        this.pitch.rotation.x = this.pitchLowLimit;
-      } else if (this.pitch.rotation.x > this.pitchHighLimit) {
-        this.pitch.rotation.x = this.pitchHighLimit;
-      }
+  /**Add rotation input
+   * Takes sensitivity into account
+   * @param {number} movementX 
+   * @param {number} movementY 
+   */
+  addRotationInput (movementX, movementY) {
+    this.yaw.rotation.y -= movementX * this.sensitivity;
+    this.pitch.rotation.x -= movementY * this.sensitivity;
+
+    if (this.pitch.rotation.x < this.pitchLowLimit) {
+      this.pitch.rotation.x = this.pitchLowLimit;
+    } else if (this.pitch.rotation.x > this.pitchHighLimit) {
+      this.pitch.rotation.x = this.pitchHighLimit;
     }
+  }
+  /**Set rotation input
+   * Takes sensitivity into account
+   * @param {number} x
+   * @param {number} y
+   */
+  setRotationInput (x, y) {
+    this.yaw.rotation.y = x * this.sensitivity;
+    this.pitch.rotation.x = y * this.sensitivity;
+
+    if (this.pitch.rotation.x < this.pitchLowLimit) {
+      this.pitch.rotation.x = this.pitchLowLimit;
+    } else if (this.pitch.rotation.x > this.pitchHighLimit) {
+      this.pitch.rotation.x = this.pitchHighLimit;
+    }
+  }
+
+  setFieldOfView (fov) {
+    throw "Not implemented yet";
   }
 
   /**Mount this camera controller to a parent object
    * Will also set the current renderer camera if passed the renderer
    * @param {Object3D} parent
-   * @param {import("../../renderer").default|false} renderer to set camera of
+   * @param {import("../../ui/renderer.js")} renderer to set camera of
    */
   mount (parent, renderer=false) {
     parent.add(this.yaw);
@@ -57,7 +76,7 @@ module.exports = class LookCamera {
   }
 
   /**Mounts the three Camera of this module to a renderer
-   * @param {import("../../renderer").default|false} renderer to set camera of */
+   * @param {import("../../ui/renderer.js")} renderer to set camera of*/
   mountToRenderer (renderer) {
     renderer.setCamera(this.camera);
   }

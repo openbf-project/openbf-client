@@ -6,6 +6,14 @@ let TimeManager = require("./time.js");
 let API = require("./api.js");
 let { StateManager } = require("./state.js");
 
+let { GameInput, InputBinding } = require("./input/gameinput.js");
+let gameInput = GameInput.get();
+gameInput.addBinding("escape", new InputBinding().addKey("Escape"));
+gameInput.addBinding("forward", new InputBinding().addKey("w"));
+gameInput.addBinding("backward", new InputBinding().addKey("s"));
+gameInput.addBinding("left", new InputBinding().addKey("a"));
+gameInput.addBinding("right", new InputBinding().addKey("d"));
+
 const Component = require("./ui/component.js");
 
 const cannon = require("cannon");

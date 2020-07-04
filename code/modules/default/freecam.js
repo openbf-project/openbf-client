@@ -1,41 +1,65 @@
 
+const three = require("three");
+
 let LookCamera = require("./lookcamera.js");
 
 const API = require("../../api.js");
 const api = API.get();
+const { GameInput } = require("../../input/gameinput.js");
+const gameInput = GameInput.get();
+
+//DEBUG
+let raycaster = new three.Raycaster();
 
 module.exports = class FreeCam extends LookCamera {
   constructor() {
     super();
-    
-    this.mount(api.getRenderer().getScene());
-    this.mountToRenderer(api.getRenderer());
-
-    document.addEventListener("click", () => {
-      api.input.tryLock(api.getRenderer().webgl.domElement);
-    });
-    document.addEventListener("keyup", (evt) => {
-        if (evt.code === "Escape") {
-            api.input.unlock();
-        }
-    });
-
-    this.entity = api.entityManager.createEntity(0, 1, this.yaw.position);
-
-    this.entity
-      .track("x", Entity.TYPE_FLOAT)
-      .track("y", Entity.TYPE_FLOAT)
-      .track("z", Entity.TYPE_FLOAT);
+    this.speed = 0.3;
   }
   update() {
+    if (gameInput.raw.pointer.locked) {
+      if (GameInput.getButton("escape")) {
+        gameInput.raw.unlock();
+      }
+
+      //DEBUG
+      if (GameInput.pointerPrimary) {
+        // raycaster.setFromCamera({
+        //   x:0.5, y:0.5
+        // }, this.camera);
+
+        // let rayHits = raycaster.intersectObjects(
+        //   api.getRenderer().getScene().children
+        // );
+        // console.log(rayHits);
+        // for (let obj of rayHits) {
+        //   obj.object.material.color.set(0xff0000);
+        //   console.log(obj);
+        // }
+      }
+
+      this.addRotationInput(
+        gameInput.raw.consumeMovementX(),
+        gameInput.raw.consumeMovementY()
+      );
+    } else {
+      if (GameInput.pointerPrimary) {
+        gameInput.raw.tryLock(api.getRenderer().webgl.domElement);
+      }
+    }
+
+    //Get the facing direction
     this.camera.getWorldDirection(this.lookDir);
-    this.lookDir.multiplyScalar(0.3);
-    if (api.input.getKey("w")) {
+
+    this.lookDir.multiplyScalar(this.speed);
+
+    if (GameInput.getButton("forward")) {
       this.yaw.position.add(this.lookDir);
-    } else if (api.input.getKey("s")) {
+    } else if (GameInput.getButton("backward")) {
       this.yaw.position.sub(this.lookDir);
     }
-    if (api.input.getKey("a")) {
+
+    if (GameInput.getButton("left")) {
       this.lookDirRight.set(
         this.lookDir.x,
         0, //this.cameraLookingDirection.y,
@@ -43,7 +67,7 @@ module.exports = class FreeCam extends LookCamera {
       );
       this.lookDirRight.applyAxisAngle(this.RIGHT, this.radRight);
       this.yaw.position.add(this.lookDirRight);
-    } else if (api.input.getKey("d")) {
+    } else if (GameInput.getButton("right")) {
       this.lookDirRight.set(
         this.lookDir.x,
         0, //this.cameraLookingDirection.y,

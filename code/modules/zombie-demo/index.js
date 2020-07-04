@@ -5,7 +5,7 @@ const api = API.get();
 const World = require("../../world/world.js");
 
 let three = require("three");
-let PerspectiveCamera = three.PerspectiveCamera;
+let FreeCam = require("../default/freecam.js");
 
 /**called by openbf
  * @param {string} _modpath path to this module not including last slash
@@ -16,25 +16,35 @@ async function register(_modpath) {
 
   api.setWorld(await World.load(worldFile, worldDir));
 
-  api.getRenderer().getScene().add(
-    new three.DirectionalLight(0xffffff, 2)
-  );
-  api.getRenderer().getScene().add(
-    new three.AmbientLight(0xffffff, 1)
-  );
+  let lightSun = new three.DirectionalLight(0xffffff, 2);
+  api.getRenderer().getScene().add(lightSun);
+  let lightAmb = new three.AmbientLight(0xffffff, 1);
+  api.getRenderer().getScene().add(lightAmb);
 
   api.getWorld().getPhysics().gravity.set(0, -9.82 * 2, 0);
 
   if (api.getHeadless()) return;
   api.getRenderer().webgl.setClearColor("#010106");
 
-  api.getRenderer().setCamera(
-    new PerspectiveCamera(75, api.getRenderer().getAspect(), 0.1, 500)
+  let freecam = new FreeCam();
+  freecam.mount(
+    api.getRenderer().getScene(),
+    api.getRenderer()
   );
-  
-  api.getRenderer().getCamera().position.set(180, 0, 0);
 
-  console.log(api.getRenderer());
+  api.getTimeManager().listen((delta)=>{
+    freecam.update();
+  });
+
+  // api.getRenderer().setCamera(
+  //   new PerspectiveCamera(75, api.getRenderer().getAspect(), 0.1, 500)
+  // );
+  
+  // api.getRenderer().getCamera().position.set(180, 0, 0);
+
+  // console.log(api.getRenderer(), lightSun, lightAmb);
+
+
   //let localPlayer = new Player(api, _modpath, "Player 1", true);
   
   //New version

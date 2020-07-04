@@ -1,7 +1,7 @@
 
 const { on, off } = require("../utils/aliases.js");
 
-module.export.Input = class Input {
+module.exports = class Input {
   constructor () {
     this.pointer = {
       x:0,
@@ -9,7 +9,10 @@ module.export.Input = class Input {
       lx:0,
       ly:0,
       leftDown:false,
-      rightDown:false
+      rightDown:false,
+      locked:false,
+      mx:0,
+      my:0
     };
     /**@type {Map<string,boolean>} keyname:state*/
     this.keyboard = new Map();
@@ -23,6 +26,7 @@ module.export.Input = class Input {
         }
       }
       this.setPointerXY(evt.clientX, evt.clientY);
+      this.setMovementXY(evt.movementX, evt.movementY);
       this.onEvent("pointer-move");
     };
     /**@param {TouchEvent} evt*/
@@ -97,8 +101,28 @@ module.export.Input = class Input {
     this.pointerLockElement;
     
     this.pointerLockChange = (e) => {
-      this.mouse.locked = document.pointerLockElement !== null;
+      this.pointer.locked = document.pointerLockElement !== null;
     }
+  }
+  setMovementXY(x, y) {
+    this.pointer.mx = x;
+    this.pointer.my = y;
+  }
+  /**Get and reset pointer movement x
+   * @returns {number}
+   */
+  consumeMovementX() {
+    let result = this.pointer.mx;
+    this.pointer.mx = 0;
+    return result;
+  }
+  /**Get and reset pointer movement y
+   * @returns {number}
+   */
+  consumeMovementY() {
+    let result = this.pointer.my;
+    this.pointer.my = 0;
+    return result;
   }
   setPointerXY (x, y) {
     this.pointer.lx = this.pointer.x;

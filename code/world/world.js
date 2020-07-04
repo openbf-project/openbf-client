@@ -3,7 +3,16 @@ const path = require("path");
 const API = require("../api.js");
 const api = API.get();
 
-const Scene = require("three").Scene;
+const three = require("three");
+const Scene = three.Scene;
+const Vector3 = three.Vector3;
+
+const VEC3_UP = new Vector3(0, 1, 0);
+const VEC3_RIGHT = new Vector3(1, 0, 0);
+
+function degToRad(deg) {
+  return deg * (Math.PI / 180);
+}
 
 /**@typedef {any} Entity*/
 /**@typedef {any} PhysicsWorld*/
@@ -70,21 +79,25 @@ module.exports = class World {
     this.models.set(id, model);
   }
   /**@param {string} id*/
-  hasModel (id) {
+  hasModel(id) {
     return this.models.has(id);
   }
   /**Place model
    * @param {Placement} placement 
    */
-  placeModel (placement) {
-    let p = {x:placement.p[0],y:placement.p[1],z:placement.p[2]};
-    let r = {w:placement.r[0],x:placement.r[1],y:placement.r[2],z:placement.r[3]};
+  placeModel(placement) {
+    let p = { x: placement.p[0], y: placement.p[1], z: placement.p[2] };
+    let r = { x: placement.r[0], y: placement.r[1], z: placement.r[2], w: placement.r[3] };
     let m = this.getModel(placement.m);
+
     m.scene.position.set(-p.x, p.y, p.z);
     m.scene.quaternion.set(r.x, r.y, r.z, r.w);
+
+    m.scene.rotateOnAxis(VEC3_RIGHT, degToRad(180));
+
     this.getVisual().add(m.scene);
   }
-  getModel (id) {
+  getModel(id) {
     return this.models.get(id);
   }
   /**Loads a map from a directory
