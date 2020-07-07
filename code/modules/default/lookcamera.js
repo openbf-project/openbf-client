@@ -9,7 +9,7 @@ const api = API.get();
 
 module.exports = class LookCamera {
   constructor () {
-    this.camera = new PerspectiveCamera(75, api.renderer.aspect, 0.1, 500);
+    this.camera = new PerspectiveCamera(75, api.renderer.aspect, 0.1, 1000);
 
     this.pitch = new Object3D();
     this.yaw = new Object3D();
@@ -29,7 +29,14 @@ module.exports = class LookCamera {
     this.pitchLowLimit = -1.5;
     this.pitchHighLimit = 1.5;
   }
-
+  /**Set the camera's position
+   * @param {number} x 
+   * @param {number} y 
+   * @param {number} z 
+   */
+  setPosition (x, y, z) {
+    this.yaw.position.set(x, y, z);
+  }
   /**Add rotation input
    * Takes sensitivity into account
    * @param {number} movementX 
@@ -62,13 +69,14 @@ module.exports = class LookCamera {
   }
 
   setFieldOfView (fov) {
-    throw "Not implemented yet";
+    this.camera.fov = fov;
+    this.camera.updateProjectionMatrix();
   }
 
   /**Mount this camera controller to a parent object
    * Will also set the current renderer camera if passed the renderer
    * @param {Object3D} parent
-   * @param {import("../../ui/renderer.js")} renderer to set camera of
+   * @param {import("../../rendering/renderer.js")} renderer to set camera of
    */
   mount (parent, renderer=false) {
     parent.add(this.yaw);
@@ -76,7 +84,7 @@ module.exports = class LookCamera {
   }
 
   /**Mounts the three Camera of this module to a renderer
-   * @param {import("../../ui/renderer.js")} renderer to set camera of*/
+   * @param {import("../../rendering/renderer.js")} renderer to set camera of*/
   mountToRenderer (renderer) {
     renderer.setCamera(this.camera);
   }

@@ -1,13 +1,17 @@
 
-let fs = require("fs");
-let GLTFLoader = require("./GLTFLoader.js");
+const fs = require("fs");
+const path = require("path");
+let GLTFLoader = require("../libs/three-extras/GLTFLoader.js");
 
-/**@typedef {import("./ui/renderer.js")} Renderer*/
-/**@typedef {import("cannon")} PhysicsEngine*/
+const { makeCannonConvexMesh } = require("./utils/math.js");
+
+/**@typedef {import("./rendering/renderer.js")} Renderer*/
+/**@typedef {import("../libs/cannon-es/cannon-es.cjs")} PhysicsEngine*/
 /**@typedef {import("./state.js").StateManager} StateManager*/
-/**@typedef {import("./ui/ui.js").UIManager} UI*/
-/**@typedef {import("./time.js")} TimeManager*/
+/**@typedef {import("./rendering/ui.js").UIManager} UI*/
+/**@typedef {import("./utils/time.js")} TimeManager*/
 /**@typedef {import("./world/world.js")} World*/
+/**@typedef {import("./modules/module.js").ModuleManager} ModuleManager*/
 
 module.exports = class API {
   /**@type {API}*/
@@ -36,17 +40,75 @@ module.exports = class API {
 
     /**@type {GLTFLoader}*/
     this.gltfLoader = undefined;
+
+    /**@type {ModuleManager}*/
+    this.moduleManager = undefined;
+
+    /**@param {import("three").Object3D} child*/
+    this.onParseModelExtras = (child)=>{
+      switch (child.type) {
+        case "SpotLight":
+          break;
+        case "":
+          break;
+        default:
+          break;
+      }
+      let data = child.userData["openbf-data"];
+      if ( typeof(data) !== "object" ) {
+        try {
+          data = JSON.parse(data);
+        } catch (ex) {
+          throw `Child of imported model openBFData is not valid json or json string, try to use Revalidate User Data in node-openbf-edit blender plugin`;
+        }
+      }
+      let shape;
+      let body;
+      let col = data.collision;
+      if (col && col.shape) {
+        switch (col.shape.type) {
+          case "MESH":
+            shape = new cannon.Trimesh(
+              child.geometry.attributes.position.array,
+              child.geometry.index.array
+            );
+            break;
+          case "CONVEX_HULL":
+            shape = makeCannonConvexMesh(
+              child.geometry.attributes.position,
+              child.geometry.index.array
+            );
+            break;
+          case "SPHERE":
+            shape = new cannon.Sphere(
+              col.shape.radius || 1
+            );
+            break;
+          default:
+            throw `userData["openbf-data"].collision.shape ${shapeType} is not supported`;
+            break;
+        }
+        body = new cannon.Body({
+          mass: data.collision.mass || 0
+        });
+        body.addShape(shape);
+        body.position.copy(child.position);
+        body.quaternion.copy(child.quaternion);
+        body.userData.visual = child;
+        child.userData.physics = body;
+      }
+    }
   }
   /**Set the time manager
    * @param {TimeManager} tm 
    */
-  setTimeManager (tm) {
+  setTimeManager(tm) {
     this.timeManager = tm;
   }
   /**Get the time manager
    * @returns {TimeManager}
    */
-  getTimeManager () {
+  getTimeManager() {
     return this.timeManager;
   }
   /**Get the gltfloader
@@ -56,10 +118,10 @@ module.exports = class API {
     if (!this.gltfLoader) this.gltfLoader = new GLTFLoader(undefined, this.getHeadless());
     return this.gltfLoader;
   }
-  setStateManager (sm) {
+  setStateManager(sm) {
     this.stateManager = sm;
   }
-  getStateManager () {
+  getStateManager() {
     return this.stateManager;
   }
   /**Get the world
@@ -78,7 +140,10 @@ module.exports = class API {
     );
     console.log("Set world", world);
   }
-  hasWorld () {
+  /**Check if a world is loaded
+   * @returns {boolean} true if a world is present
+   */
+  hasWorld() {
     return this.world !== undefined;
   }
   /**Set the ui reference
@@ -114,6 +179,9 @@ module.exports = class API {
    * @returns {PhysicsEngine|undefined}
    */
   getPhysicsEngine() {
+    return this.engine;
+  }
+  get physicsEngine() {
     return this.engine;
   }
   /**Set the renderer reference
@@ -167,7 +235,7 @@ module.exports = class API {
    * @param {string} url
    * @returns {Promise<Buffer>}
    */
-  readBufferFile (url) {
+  readBufferFile(url) {
     return new Promise((resolve, reject) => {
       try {
         let result = fs.readFileSync(url);
@@ -181,7 +249,7 @@ module.exports = class API {
    * @param {string} url
    * @returns {Promise<ArrayBuffer>}
    */
-  readArrayBufferFile (url) {
+  readArrayBufferFile(url) {
     return new Promise((resolve, reject) => {
       try {
         let result = fs.readFileSync(url).buffer;
@@ -191,20 +259,72 @@ module.exports = class API {
       }
     });
   }
+  /**Parses extras on model (collision, lights, etc)
+   * @param {{scene:import("three").Scene}} model
+   */
+  parseModelExtras (model) {
+    model.traverse (this.onParseModelExtras);
+    // mixer = new AnimationMixer(gltf.scene);
+    // gltf.animations.forEach((clip) => {
+    //   mixer.clipAction(clip).play();
+    // });
+  }
   /**Currently supports only GLTF and GLB files
    * @param {string} fname model file to load
    * @returns {Promise<model>}
    */
-  loadModel(fname) {
+  loadModel(fname, parseExtras=false) {
     return new Promise((resolve, reject) => {
       try {
-        this.getGLTFLoader().load(fname, resolve, undefined, reject);
-        //let ab = this.readArrayBufferFile(fname);
-        //this.getGLTFLoader().parse(ab, fname, resolve, reject);
+        this.getGLTFLoader().load(fname, (model)=>{
+          if (parseExtras) this.parseModelExtras(model);
+          resolve(model);
+        }, undefined, reject);
       } catch (ex) {
         reject(ex);
       }
     });
   }
+  /**Read a directory
+   * @param {string} dir
+   * @returns {Promise<{files:Array<string>, dirs:Array<string>}>}
+   */
+  readDir(dir) {
+    return new Promise((resolve, reject) => {
+      try {
+        let result = {
+          files: new Array(),
+          dirs: new Array()
+        };
+        let items = fs.readdirSync(dir);
+        let stat;
+        let itemAbs;
+        for (let item of items) {
+          itemAbs = path.join(dir, item);
+          stat = fs.statSync(itemAbs);
+          if (stat.isDirectory()) {
+            result.dirs.push(item);
+          } else if (stat.isFile()) {
+            result.files.push(item);
+          }
+        }
+        resolve(result);
+      } catch (ex) {
+        console.log(ex);
+        reject(ex);
+      }
+    });
+  }
+  /**Join file path
+   * @param  {...string} strs path to join
+   */
+  pathJoin (...strs) {
+    return path.join(...strs);
+  }
+  setModuleManager (manager) {
+    this.moduleManager = manager;
+  }
+  getModuleManager () {
+    return this.moduleManager;
+  }
 }
-

@@ -7,7 +7,6 @@ const three = require("three");
 const Scene = three.Scene;
 const Vector3 = three.Vector3;
 
-const VEC3_UP = new Vector3(0, 1, 0);
 const VEC3_RIGHT = new Vector3(1, 0, 0);
 
 function degToRad(deg) {
@@ -15,9 +14,9 @@ function degToRad(deg) {
 }
 
 /**@typedef {any} Entity*/
-/**@typedef {any} PhysicsWorld*/
-/**@typedef {any} VisualWorld*/
-/**@typedef {import("../ui/renderer.js")} Renderer*/
+/**@typedef {import("../../libs/cannon-es/cannon-es.cjs").World} PhysicsWorld*/
+/**@typedef {import("three").Scene} VisualWorld*/
+/**@typedef {import("../rendering/renderer.js")} Renderer*/
 
 /**@typedef {{p:{x:number,y:number,z:number},r:{x:number,y:number,z:number,w:number},m:string}} Placement*/
 
@@ -76,6 +75,18 @@ module.exports = class World {
     this.physics = physics;
   }
   addModel(id, model) {
+    if (!model.traverse) {
+      console.log(model);
+      throw "Break";
+    }
+    model.traverse((child) => {
+      if (child.isMesh && child.material) {
+        if (child.material.metalness > 0.95) {
+          // console.log("Set mesh metalness to average level");
+          child.material.metalness = 0.88;
+        }
+      }
+    });
     this.models.set(id, model);
   }
   /**@param {string} id*/
@@ -83,19 +94,25 @@ module.exports = class World {
     return this.models.has(id);
   }
   /**Place model
-   * @param {Placement} placement 
+   * Not cloning will move the original model
+   * @param {Placement} placement
+   * @param {boolean} useClone where to clone the model or not
    */
-  placeModel(placement) {
+  placeModel(placement, useClone=false) {
     let p = { x: placement.p[0], y: placement.p[1], z: placement.p[2] };
     let r = { x: placement.r[0], y: placement.r[1], z: placement.r[2], w: placement.r[3] };
     let m = this.getModel(placement.m);
+    if (useClone) {
+      m = m.clone(true);
+    }
+    m.receiveShadow = true;
+    
+    m.position.set(-p.x, p.y, p.z);
+    m.quaternion.set(r.x, r.y, r.z, r.w);
 
-    m.scene.position.set(-p.x, p.y, p.z);
-    m.scene.quaternion.set(r.x, r.y, r.z, r.w);
+    m.rotateOnAxis(VEC3_RIGHT, degToRad(180));
 
-    m.scene.rotateOnAxis(VEC3_RIGHT, degToRad(180));
-
-    this.getVisual().add(m.scene);
+    this.getVisual().add(m);
   }
   getModel(id) {
     return this.models.get(id);
@@ -118,7 +135,6 @@ module.exports = class World {
 
         /**@type {string}*/
         let modelFile = undefined;
-        console.log(json);
 
         if (json.placements) {
           for (let placement of json.placements) {
@@ -126,12 +142,20 @@ module.exports = class World {
               console.warn("Placement invalid", placement);
               continue;
             }
-            modelFile = path.join(dir, "models", placement.m + ".glb");
-            if (true) {//!result.hasModel(placement.m)) {
-              let model = await api.loadModel(modelFile);
-              result.addModel(placement.m, model);
+            if (!result.hasModel(placement.m)) {
+              modelFile = path.join(dir, "models", placement.m + ".glb");
+              let model = await api.loadModel(modelFile, true);
+              result.addModel(placement.m, model.scene);
+
+              //False for non-cloning mode
+              result.placeModel(placement, false);
+            } else {
+              //TODO - implement mesh instancing here
+              //For now we'll just clone (better than reading disk n*times)
+
+              //True for cloning mode
+              result.placeModel(placement, true);
             }
-            result.placeModel(placement);
           }
         }
         resolve(result);

@@ -1,0 +1,5 @@
+{
+  "name": "default",
+  "description": "The default module of openbf",
+  "main": "index.js"
+}
