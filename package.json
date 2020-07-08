@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/node-openbf-project/node-openbf-client#readme",
   "dependencies": {
-    "electron": "^7.3.2",
+    "electron": "^9.1.0",
     "three": "^0.97.0"
   },
   "devDependencies": {}

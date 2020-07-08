@@ -113,7 +113,16 @@ class InputBinding {
     if (input.getGamePadManager().ensure()) {
       //Test all the gamepad axis rules
       for (let rule of this.padAxes) {
-        if (rule.test(input.getGamePadManager().getPrimary())) {
+        let gp = input.getGamePadManager().getPrimary();
+        if (rule.test(gp)) {
+          if (gp.vibrationActuator) {
+              gp.vibrationActuator.playEffect("dual-rumble", {
+                startDelay: 0,
+                duration: parseInt(30*Math.random()),
+                weakMagnitude: Math.random(),
+                strongMagnitude: Math.random()
+              })
+            }
           return true;
         }
       }
@@ -176,8 +185,8 @@ class GamePadManager {
     return GamePadManager.SINGLETON;
   }
   registerEvents() {
-    on(window, "gamepadconnected", this.onGamePadConnected);
-    on(window, "gamepaddisconnected", this.onGamePadDisconnected);
+    // on(window, "gamepadconnected", this.onGamePadConnected);
+    // on(window, "gamepaddisconnected", this.onGamePadDisconnected);
   }
   unregisterEvents() {
     off(window, "gamepadconnected", this.onGamePadConnected);
@@ -187,8 +196,19 @@ class GamePadManager {
    * @returns {Array<Gamepad>}
    */
   nativeGetAllGamepads() {
-    //navigator.getGamepads(); //Doesn't work in electron..
-    return this.allGamePadsFix;
+    // return navigator.getGamepads(); //Doesn't work in electron..
+    // return this.allGamePadsFix; //Doesn't work in electron properly
+
+    let result = new Array();
+    let list = navigator.getGamepads();
+    let item = undefined;
+    for (let i=0; i < list.length; i++) {
+      item = list.item(i);
+      if (item) {
+        result.push ( item );
+      }
+    }
+    return result;
   }
   /**Tries to get a valid gamepad
    * @returns {Gamepad|false}
@@ -206,7 +226,9 @@ class GamePadManager {
    * Returns success or not
    */
   ensure() {
-    if (!this.primary || !this.primary.connected) {
+    //TODO - remove after electron fixes their shit
+    //https://github.com/electron/electron/issues/24453
+    if (true) {//!this.primary || !this.primary.connected) {
       this.primary = this.findGamepad();
       if (this.primary === false) {
         //console.warn("Couldn't find any valid game pads in navigator..");
