@@ -115,14 +115,14 @@ class InputBinding {
       for (let rule of this.padAxes) {
         let gp = input.getGamePadManager().getPrimary();
         if (rule.test(gp)) {
-          if (gp.vibrationActuator) {
-              gp.vibrationActuator.playEffect("dual-rumble", {
-                startDelay: 0,
-                duration: parseInt(30*Math.random()),
-                weakMagnitude: Math.random(),
-                strongMagnitude: Math.random()
-              })
-            }
+          // if (gp.vibrationActuator) {
+          //   gp.vibrationActuator.playEffect("dual-rumble", {
+          //     startDelay: 0,
+          //     duration: parseInt(30 * Math.random()),
+          //     weakMagnitude: Math.random(),
+          //     strongMagnitude: Math.random()
+          //   })
+          // }
           return true;
         }
       }
@@ -202,10 +202,10 @@ class GamePadManager {
     let result = new Array();
     let list = navigator.getGamepads();
     let item = undefined;
-    for (let i=0; i < list.length; i++) {
+    for (let i = 0; i < list.length; i++) {
       item = list.item(i);
       if (item) {
-        result.push ( item );
+        result.push(item);
       }
     }
     return result;
@@ -401,11 +401,19 @@ class GameInput {
     this.addBinding(name, result);
     return result;
   }
+  /**Tests whether a binding is currently added by name
+   * @param {string} name
+   * @returns {boolean}
+   */
+  hasBinding(name) {
+    return this.inputBindings.has(name);
+  }
   /**Gets a binding by its name
    * @param {string} name
    * @returns {InputBinding}
    */
   getBinding(name) {
+    if (!this.hasBinding(name)) throw `No binding found for ${name}`;
     return this.inputBindings.get(name);
   }
   /**Tests whether a button is activated or not
@@ -421,11 +429,7 @@ class GameInput {
    * @returns {boolean} true if down, false if up
    */
   static getButton(name) {
-    try {
-      return GameInput.SINGLETON.getButton(name);
-    } catch (ex) {
-      throw `getButton error: ${ex}`;
-    }
+    return GameInput.SINGLETON.getButton(name);
   }
   /**@type {number} the same as GameInput.get().raw.pointer.x
    * Gets the raw pointer offset in the renderer (screen)

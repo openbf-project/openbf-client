@@ -18,6 +18,10 @@ gameInput.createBinding("escape")
   .addKey("Escape")
   .addPadButton(1);
 
+gameInput.createBinding("ok")
+  .addKey("e")
+  .addPadButton(0);
+
 gameInput.createBinding("forward")
   .addKey("w")
   .createPadAxisRule(1, AxisRule.LESS_THAN, -0.5);
@@ -33,6 +37,18 @@ gameInput.createBinding("left")
 gameInput.createBinding("right")
   .addKey("d")
   .createPadAxisRule(0, AxisRule.GREATER_THAN, 0.5);
+
+gameInput.createBinding("steer-left")
+  .createPadAxisRule(3, AxisRule.LESS_THAN, -0.5);
+
+gameInput.createBinding("steer-right")
+  .createPadAxisRule(3, AxisRule.GREATER_THAN, 0.5);
+
+gameInput.createBinding("steer-up")
+  .createPadAxisRule(4, AxisRule.LESS_THAN, -0.5);
+
+gameInput.createBinding("steer-down")
+  .createPadAxisRule(4, AxisRule.GREATER_THAN, 0.5);
 
 const Component = require("./rendering/component.js");
 

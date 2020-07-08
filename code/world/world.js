@@ -75,7 +75,7 @@ module.exports = class World {
     this.physics = physics;
   }
   addModel(id, model) {
-    if (!model.traverse) {
+    if (!model.traverse || typeof(model.traverse) !== "function" ) {
       console.log(model);
       throw "Break";
     }

@@ -18,6 +18,7 @@ module.exports = class LookCamera {
     this.posY = 0;
 
     this.sensitivity = 0.002;
+    this.gpLookSensitivity = 10;
 
     this.lookDirRight = new Vector3();
     this.RIGHT = new Vector3(0, 1, 0);

@@ -1,6 +1,4 @@
 
-const three = require("three");
-
 let LookCamera = require("./lookcamera.js");
 
 const API = require("../../api.js");
@@ -8,13 +6,10 @@ const api = API.get();
 const { GameInput } = require("../../input/gameinput.js");
 const gameInput = GameInput.get();
 
-//DEBUG
-let raycaster = new three.Raycaster();
-
 class FreeCam extends LookCamera {
   constructor() {
     super();
-    this.speed = 0.3;
+    this.speed = 0.5;//0.08;
   }
   update() {
     if (gameInput.raw.pointer.locked) {
@@ -22,20 +17,16 @@ class FreeCam extends LookCamera {
         gameInput.raw.unlock();
       }
 
-      //DEBUG
-      if (GameInput.pointerPrimary) {
-        // raycaster.setFromCamera({
-        //   x:0.5, y:0.5
-        // }, this.camera);
+      if (GameInput.getButton("steer-left")) {
+        gameInput.raw.pointer.mx -= this.gpLookSensitivity;
+      } else if (GameInput.getButton("steer-right")) {
+        gameInput.raw.pointer.mx += this.gpLookSensitivity;
+      }
 
-        // let rayHits = raycaster.intersectObjects(
-        //   api.getRenderer().getScene().children
-        // );
-        // console.log(rayHits);
-        // for (let obj of rayHits) {
-        //   obj.object.material.color.set(0xff0000);
-        //   console.log(obj);
-        // }
+      if (GameInput.getButton("steer-up")) {
+        gameInput.raw.pointer.my -= this.gpLookSensitivity;
+      } else if (GameInput.getButton("steer-down")) {
+        gameInput.raw.pointer.my += this.gpLookSensitivity;
       }
 
       this.addRotationInput(
@@ -43,11 +34,11 @@ class FreeCam extends LookCamera {
         gameInput.raw.consumeMovementY()
       );
     } else {
-      if (GameInput.pointerPrimary) {
+      if (GameInput.getButton("ok")) {//GameInput.pointerPrimary) {
         gameInput.raw.tryLock(api.getRenderer().webgl.domElement);
       }
     }
-
+    if (!gameInput.raw.pointer.locked) return;
     //Get the facing direction
     this.camera.getWorldDirection(this.lookDir);
 

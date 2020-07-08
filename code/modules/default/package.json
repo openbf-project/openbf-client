@@ -1,5 +1,6 @@
 {
   "name": "default",
   "description": "The default module of openbf",
-  "main": "index.js"
+  "main": "index.js",
+  "enabled":false
 }

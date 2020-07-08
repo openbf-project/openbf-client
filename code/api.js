@@ -55,6 +55,7 @@ module.exports = class API {
           break;
       }
       let data = child.userData["openbf-data"];
+      if (!data) return;
       if ( typeof(data) !== "object" ) {
         try {
           data = JSON.parse(data);
@@ -263,7 +264,7 @@ module.exports = class API {
    * @param {{scene:import("three").Scene}} model
    */
   parseModelExtras (model) {
-    model.traverse (this.onParseModelExtras);
+    model.scene.traverse (this.onParseModelExtras);
     // mixer = new AnimationMixer(gltf.scene);
     // gltf.animations.forEach((clip) => {
     //   mixer.clipAction(clip).play();

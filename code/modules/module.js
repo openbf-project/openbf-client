@@ -91,7 +91,11 @@ class ModuleManager {
 
         let mod = require(mainFile);
         if (mod.register) {
-          await mod.register(dir);
+          if (pkgJson.enabled !== false) {
+            await mod.register(dir);
+          } else {
+            console.log("Not registering module because package.json says it is disabled");
+          }
         } else {
           console.warn(`Module ${modNameSpace} has package.json, main, but main did not export a register function`);
         }

@@ -5,7 +5,7 @@ const api = API.get();
 const World = require("../../world/world.js");
 
 let three = require("three");
-let FreeCam = require("../default/freecam.js");
+let { FreeCam } = require("../default/freecam.js");
 
 /**called by openbf
  * @param {string} _modpath path to this module not including last slash
@@ -24,16 +24,16 @@ async function register(_modpath) {
   api.getWorld().getPhysics().gravity.set(0, -9.82 * 2, 0);
 
   if (api.getHeadless()) return;
-  api.getRenderer().webgl.setClearColor("#12141c");
+  api.getRenderer().setBackgroundColor("#12141c");
 
-  // let freecam = new FreeCam();
-  // freecam.setFieldOfView(90);
-  // freecam.mount(
-  //   api.getRenderer().getScene(),
-  //   api.getRenderer()
-  // );
+  let freecam = new FreeCam();
+  freecam.setFieldOfView(90);
+  freecam.mount(
+    api.getRenderer().getScene(),
+    api.getRenderer()
+  );
 
-  //freecam.setPosition(132, -32, -143);
+  freecam.setPosition(132, -32, -143);
 
   let skyDome = await api.loadModel(
     path.join(worldDir, "models", "bes2_sky_dome.glb")
@@ -46,7 +46,7 @@ async function register(_modpath) {
   // api.getRenderer().getScene().fog = bespinFog;
   
   api.getTimeManager().listen((delta)=>{
-    //freecam.update();
+    freecam.update();
     skyDome.scene.position.copy(freecam.yaw.position);
   });
 
