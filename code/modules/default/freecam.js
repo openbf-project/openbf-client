@@ -11,7 +11,7 @@ const gameInput = GameInput.get();
 //DEBUG
 let raycaster = new three.Raycaster();
 
-module.exports = class FreeCam extends LookCamera {
+class FreeCam extends LookCamera {
   constructor() {
     super();
     this.speed = 0.3;
@@ -78,3 +78,4 @@ module.exports = class FreeCam extends LookCamera {
     }
   }
 }
+module.exports.FreeCam = FreeCam;

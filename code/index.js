@@ -12,13 +12,27 @@ let { ModuleManager } = require("./modules/module.js");
 let API = require("./api.js");
 const api = API.get();
 
-let { GameInput, InputBinding } = require("./input/gameinput.js");
+let { GameInput, InputBinding, AxisRule } = require("./input/gameinput.js");
 let gameInput = GameInput.get();
-gameInput.addBinding("escape", new InputBinding().addKey("Escape"));
-gameInput.addBinding("forward", new InputBinding().addKey("w"));
-gameInput.addBinding("backward", new InputBinding().addKey("s"));
-gameInput.addBinding("left", new InputBinding().addKey("a"));
-gameInput.addBinding("right", new InputBinding().addKey("d"));
+gameInput.createBinding("escape")
+  .addKey("Escape")
+  .addPadButton(1);
+
+gameInput.createBinding("forward")
+  .addKey("w")
+  .createPadAxisRule(1, AxisRule.LESS_THAN, -0.5);
+
+gameInput.createBinding("backward")
+  .addKey("s")
+  .createPadAxisRule(1, AxisRule.GREATER_THAN, 0.5);
+
+gameInput.createBinding("left")
+  .addKey("a")
+  .createPadAxisRule(0, AxisRule.LESS_THAN, -0.5);
+
+gameInput.createBinding("right")
+  .addKey("d")
+  .createPadAxisRule(0, AxisRule.GREATER_THAN, 0.5);
 
 const Component = require("./rendering/component.js");
 
