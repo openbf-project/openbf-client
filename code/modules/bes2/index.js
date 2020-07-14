@@ -21,7 +21,7 @@ async function register(_modpath) {
   let lightAmb = new three.AmbientLight(0xffffff, 1.5);
   api.getRenderer().getScene().add(lightAmb);
 
-  api.getWorld().getPhysics().gravity.set(0, -9.82 * 2, 0);
+  api.getWorld().getPhysics().gravity.set(0, -9.82, 0);
 
   if (api.getHeadless()) return;
   api.getRenderer().setBackgroundColor("#12141c");

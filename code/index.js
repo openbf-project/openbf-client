@@ -76,9 +76,11 @@ on(window, "resize", () => {
   api.renderer.resize(container.rect.width, container.rect.height);
 });
 
+setTimeout(()=>{
 api.getTimeManager().listen((delta) => {
   if (api.hasWorld()) api.getWorld().update(delta);
 });
+}, 2000);
 
 let _modspath = path.resolve("./code/modules");
 

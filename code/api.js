@@ -1,6 +1,9 @@
 
 const fs = require("fs");
 const path = require("path");
+const cannon = require("../libs/cannon-es/cannon-es.cjs");
+const three = require("three");
+const AnimationMixer = three.AnimationMixer;
 let GLTFLoader = require("../libs/three-extras/GLTFLoader.js");
 
 const { makeCannonConvexMesh } = require("./utils/math.js");
@@ -44,19 +47,20 @@ module.exports = class API {
     /**@type {ModuleManager}*/
     this.moduleManager = undefined;
 
-    /**@param {import("three").Object3D} child*/
-    this.onParseModelExtras = (child)=>{
-      switch (child.type) {
-        case "SpotLight":
-          break;
-        case "":
-          break;
-        default:
-          break;
-      }
+    /**@param {import("three").Scene} model
+     * @param {import("three").Object3D} child*/
+    this.onParseModelExtras = (model, child) => {
+      // switch (child.type) {
+      //   case "SpotLight":
+      //     break;
+      //   case "":
+      //     break;
+      //   default:
+      //     break;
+      // }
       let data = child.userData["openbf-data"];
       if (!data) return;
-      if ( typeof(data) !== "object" ) {
+      if (typeof (data) !== "object") {
         try {
           data = JSON.parse(data);
         } catch (ex) {
@@ -66,8 +70,9 @@ module.exports = class API {
       let shape;
       let body;
       let col = data.collision;
+      let physics = data.physics;
       if (col && col.shape) {
-        switch (col.shape.type) {
+        switch (col.shape) {
           case "MESH":
             shape = new cannon.Trimesh(
               child.geometry.attributes.position.array,
@@ -76,7 +81,7 @@ module.exports = class API {
             break;
           case "CONVEX_HULL":
             shape = makeCannonConvexMesh(
-              child.geometry.attributes.position,
+              child.geometry.attributes.position.array,
               child.geometry.index.array
             );
             break;
@@ -85,18 +90,39 @@ module.exports = class API {
               col.shape.radius || 1
             );
             break;
+          case "BOX":
+            shape = new cannon.Box(new cannon.Vec3(
+              col.width / 2,
+              col.height / 2,
+              col.depth / 2
+            ));
+            break;
           default:
             throw `userData["openbf-data"].collision.shape ${shapeType} is not supported`;
             break;
         }
+        let mass = physics.mass || 0;
+        if (physics.dynamic === 0) mass = 0;
         body = new cannon.Body({
-          mass: data.collision.mass || 0
+          mass: mass
         });
         body.addShape(shape);
         body.position.copy(child.position);
         body.quaternion.copy(child.quaternion);
+        if (!body.userData) body.userData = {};
         body.userData.visual = child;
         child.userData.physics = body;
+        
+        //shape offset isn't supported yet, might have to fork cannon project..
+        //shape rotation isn't supported yet
+        //shape scale isn't supported yet
+        if (!model.userData.physicsBodies) {
+          model.userData.physicsBodies = new Array();
+        }
+
+        model.userData.physicsBodies.push(body);
+
+        // console.log(body);
       }
     }
   }
@@ -260,25 +286,25 @@ module.exports = class API {
       }
     });
   }
-  /**Parses extras on model (collision, lights, etc)
-   * @param {{scene:import("three").Scene}} model
-   */
-  parseModelExtras (model) {
-    model.scene.traverse (this.onParseModelExtras);
-    // mixer = new AnimationMixer(gltf.scene);
-    // gltf.animations.forEach((clip) => {
-    //   mixer.clipAction(clip).play();
-    // });
-  }
   /**Currently supports only GLTF and GLB files
    * @param {string} fname model file to load
    * @returns {Promise<model>}
    */
-  loadModel(fname, parseExtras=false) {
+  loadModel(fname, parseExtras = false) {
     return new Promise((resolve, reject) => {
       try {
-        this.getGLTFLoader().load(fname, (model)=>{
-          if (parseExtras) this.parseModelExtras(model);
+        this.getGLTFLoader().load(fname, (model) => {
+          if (parseExtras) {
+            model.scene.traverse((child) => {
+              this.onParseModelExtras(model, child);
+            });
+            if (model.animations && model.animations.length > 0) {
+              model.scene.userData.animMixer = new AnimationMixer(model.scene);
+              model.animations.forEach((clip) => {
+                model.scene.userData.animMixer.clipAction(clip).play();
+              });
+            }
+          }
           resolve(model);
         }, undefined, reject);
       } catch (ex) {
@@ -319,13 +345,13 @@ module.exports = class API {
   /**Join file path
    * @param  {...string} strs path to join
    */
-  pathJoin (...strs) {
+  pathJoin(...strs) {
     return path.join(...strs);
   }
-  setModuleManager (manager) {
+  setModuleManager(manager) {
     this.moduleManager = manager;
   }
-  getModuleManager () {
+  getModuleManager() {
     return this.moduleManager;
   }
 }
