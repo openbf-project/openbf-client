@@ -14,7 +14,6 @@ export default class Component {
     if (parent instanceof HTMLElement) {
       parent.appendChild(this.element);
     } else if (parent instanceof Component) {
-      console.log(parent);
       parent.element.appendChild(this.element);
     } else {
       throw "Cannot append to parent because its not a Component or HTMLElement";

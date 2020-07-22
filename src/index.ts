@@ -64,11 +64,11 @@ on(window, "resize", () => {
   api.renderer.resize(container.rect.width, container.rect.height);
 });
 
+api.renderer.resize(container.rect.width, container.rect.height);
+api.renderer.useDefaultCamera();
+api.renderer.start();
+
 setTimeout(() => {
-  console.log(container, container.rect);
-  api.renderer.resize(container.rect.width, container.rect.height);
-  api.renderer.useDefaultCamera();
-  api.renderer.start();
   api.getTimeManager().listen((delta) => {
 
   });
