@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+    "target": "es6",
+    //No need for this line because of modified method in including ts defs
+    //I'm not using node.. sooo
+		// "moduleResolution": "node",
+  },
+  //No need for this line because of simply renaming three.module.js to Three.js
+  //Accompanying Three.d.ts
+  //This line adds the typescript definitions for three.module.js
+  //Modified method from https://threejs.org/docs/#manual/en/introduction/Typescript-setup
+  //Basically if you copy all the .d.ts defs from three-dev.zip, this points to their paths individually
+	// "include": [ "./src/libs/three/**/*.ts" ],
+}

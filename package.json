@@ -1,0 +1,31 @@
+{
+  "name": "openbf-ts",
+  "version": "1.0.0",
+  "description": "OpenBF client - written in ts for esm",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RepComm/openbf-ts.git"
+  },
+  "keywords": [
+    "typescript",
+    "esmodules",
+    "babel",
+    "openbf"
+  ],
+  "author": "Jonathan Crowder",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/openbf-project/openbf-ts/issues"
+  },
+  "homepage": "https://github.com/openbf-project/openbf-ts#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.10.5",
+    "@babel/plugin-transform-typescript": "^7.10.5",
+    "@babel/preset-env": "^7.10.4"
+  },
+  "scripts": {
+    "build": "babel src --extensions '.ts' --copy-files -d apphost/build"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets":{
+          "esmodules":true
+        },
+        "bugfixes": true,
+        "spec":true,
+        "modules":false
+      }
+    ]
+  ],
+  "plugins": ["@babel/plugin-transform-typescript"],
+  "ignore": [
+    "./src/libs/three/*"
+  ]//,
+  // "exclude":[
+  //   "./src/libs/three/**/*.d.ts"
+  // ]
+}
