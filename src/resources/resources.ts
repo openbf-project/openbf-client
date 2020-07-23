@@ -131,12 +131,20 @@ export class ResourceManager {
 
 export class Module extends Resource {
   isLoaded: boolean = false;
+  imps: any;
   setLoaded (loaded:boolean): Module {
     this.isLoaded = loaded;
     return this;
   }
   getLoaded (): boolean {
     return this.isLoaded;
+  }
+  setImports (imps: any): Module {
+    this.imps = imps;
+    return this;
+  }
+  getImports (): any {
+    return this.imps;
   }
 }
 
@@ -177,7 +185,9 @@ export class ModuleManager {
       let _path = ResourceManager.get().resourceNameToURL(
         `${mod.url}/${pkgJson.main}`
       )
-      await import (_path);
+      let imps = await import (_path);
+      mod.setImports(imps);
+      mod.setLoaded(true);
     }
   }
   getModule(name: string): Promise<Module> {
