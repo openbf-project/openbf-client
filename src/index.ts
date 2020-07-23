@@ -7,7 +7,7 @@ const api = API.get();
 
 import Renderer from "./rendering/renderer.js";
 import { TimeManager } from "./utils/time.js";
-import { ModuleManager } from "./resources/module.js";
+import { ModuleManager, ResourceManager } from "./resources/resources.js";
 
 import { GameInput, InputBinding, AxisRule } from "./input/gameinput.js";
 
@@ -75,5 +75,12 @@ setTimeout(() => {
 
 }, 2000);
 
+let resourceManager = ResourceManager.get();
+api.setResourceManager(resourceManager);
+
 let moduleManager = ModuleManager.get();
 api.setModuleManager(moduleManager);
+
+moduleManager.queryModules().then((json)=>{
+  console.log("Query'd mods", json);
+});

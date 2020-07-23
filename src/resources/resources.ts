@@ -1,22 +1,55 @@
 
+
+import API from "../api.js";
+const api: API = API.get();
+
+const textDec = new TextDecoder();
+
 export class Resource {
   arrayBuffer: ArrayBuffer;
+  url: string;
   constructor () {
   }
   setArrayBuffer( ab: ArrayBuffer ): Resource {
     this.arrayBuffer = ab;
     return this;
   }
+  text (): string {
+    let result = textDec.decode(this.arrayBuffer);
+    console.log(result);
+    return result;
+  }
+  json (): any {
+    return JSON.parse(this.text());
+  }
 }
 
 export class ResourceManager {
   resources: Map<string, Resource>;
-  resourceRootURL: "http://localhost/resource";
+  resourceTransport: string = "http";
+  resourceDomain: string = "localhost:8080";
+  static SINGLETON: ResourceManager = undefined;
   constructor () {
+    if (ResourceManager.SINGLETON) throw "Cannot instance ResourceManager twice";
     this.resources = new Map();
   }
-  resourceNameToURL (name: string): string {
-    return `${this.resourceRootURL}/${name}`;
+  static get(): ResourceManager {
+    if (!ResourceManager.SINGLETON) {
+      ResourceManager.SINGLETON = new ResourceManager();
+    }
+    return ResourceManager.SINGLETON;
+  }
+  resourceNameToURL (name: string, mod: Module|undefined = undefined): string {
+    switch (name.charAt(0)) {
+      case "@":
+        //Relative to module/resources
+        break;
+      case "~":
+        //JSON query
+        console.log(name);
+        break;
+    }
+    return `${this.resourceTransport}://${this.resourceDomain}/${name}`;
   }
   /**Internal - used to load resources
    * @param name of resource
@@ -26,6 +59,7 @@ export class ResourceManager {
       let url: string;
       try {
         url = this.resourceNameToURL(name);
+        console.log(url);
       } catch (ex) {
         reject(`Couldn't parse resource name to url ${name}`);
       }
@@ -56,10 +90,18 @@ export class ResourceManager {
    */
   getResource (name: string): Promise<Resource> {
     return new Promise(async (resolve, reject)=>{
+      let result: Resource|void;
       if (this.hasResource(name)) {
-        resolve(this.resources.get(name));
+        result = this.resources.get(name);
       } else {
-        resolve(await this._loadResource(name));
+        result = await this._loadResource(name).catch((reason)=>{
+          reject(reason);
+        });
+      }
+      if (result) {
+        resolve(result);
+      } else {
+        //Doesn't happen
       }
     });
   }
@@ -86,3 +128,57 @@ export class ResourceManager {
   //   });
   // }
 }
+
+export interface Module extends Resource {
+}
+
+export class ModuleManager {
+  static SINGLETON: ModuleManager = undefined;
+  loadedModules: Map<string, Module>;
+  constructor() {
+    if (!ModuleManager.SINGLETON) {
+      ModuleManager.SINGLETON = this;
+    } else {
+      throw "Module should not be instantiated more than once";
+    }
+    this.loadedModules = new Map();
+  }
+  static get(): ModuleManager {
+    if (!ModuleManager.SINGLETON) {
+      new ModuleManager();
+    }
+    return ModuleManager.SINGLETON;
+  }
+  addModule(name: string, mod: Module): ModuleManager {
+    if (this.hasModule(name)) throw `Adding module of same name ${name}`;
+    this.setModule(name, mod);
+    return this;
+  }
+  hasModule(name: string): boolean {
+    return this.loadedModules.has(name);
+  }
+  setModule(name: string, mod: Module): ModuleManager {
+    this.loadedModules.set(name, mod);
+    return this;
+  }
+  getModule(name: string): Module {
+    return this.loadedModules.get(name);
+  }
+  listModules (): Array<Module> {
+    let result = new Array();
+    this.loadedModules.forEach((v, k)=>{
+      result.push(k);
+    });
+    return result;
+  }
+  queryModules (): Promise<any> {
+    return new Promise(async (resolve, reject)=>{
+      let json = await (
+        await ResourceManager.get()
+        .getResource("~query.modules")
+      ).json();
+      resolve(json);
+    });
+  }
+}
+
