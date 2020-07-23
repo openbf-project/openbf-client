@@ -1,6 +1,7 @@
 {
 	"compilerOptions": {
-    "target": "es6",
+    "target": "ESNEXT",
+    "module":"esnext"
     //No need for this line because of modified method in including ts defs
     //I'm not using node.. sooo
 		// "moduleResolution": "node",

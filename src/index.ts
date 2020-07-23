@@ -82,5 +82,10 @@ let moduleManager = ModuleManager.get();
 api.setModuleManager(moduleManager);
 
 moduleManager.queryModules().then((json)=>{
-  console.log("Query'd mods", json);
+  let keys = Object.keys(json.data);
+  for (let key of keys) {
+    moduleManager.getModule(key).then((mod)=>{
+      console.log("Loaded mod");
+    });
+  }
 });

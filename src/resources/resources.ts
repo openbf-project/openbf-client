@@ -8,18 +8,18 @@ const textDec = new TextDecoder();
 export class Resource {
   arrayBuffer: ArrayBuffer;
   url: string;
-  constructor () {
+  constructor() {
   }
-  setArrayBuffer( ab: ArrayBuffer ): Resource {
+  setArrayBuffer(ab: ArrayBuffer): Resource {
     this.arrayBuffer = ab;
     return this;
   }
-  text (): string {
+  text(): string {
     let result = textDec.decode(this.arrayBuffer);
     console.log(result);
     return result;
   }
-  json (): any {
+  json(): any {
     return JSON.parse(this.text());
   }
 }
@@ -29,7 +29,7 @@ export class ResourceManager {
   resourceTransport: string = "http";
   resourceDomain: string = "localhost:8080";
   static SINGLETON: ResourceManager = undefined;
-  constructor () {
+  constructor() {
     if (ResourceManager.SINGLETON) throw "Cannot instance ResourceManager twice";
     this.resources = new Map();
   }
@@ -39,9 +39,9 @@ export class ResourceManager {
     }
     return ResourceManager.SINGLETON;
   }
-  resourceNameToURL (name: string, mod: Module|undefined = undefined): string {
+  resourceNameToURL(name: string, mod: Module | undefined = undefined): string {
     switch (name.charAt(0)) {
-      case "@":
+      case ModuleManager.MODULE_RESOURCE_PREFIX:
         //Relative to module/resources
         break;
       case "~":
@@ -54,8 +54,8 @@ export class ResourceManager {
   /**Internal - used to load resources
    * @param name of resource
    */
-  _loadResource (name: string): Promise<Resource> {
-    return new Promise(async (resolve, reject)=>{
+  _loadResource(name: string): Promise<Resource> {
+    return new Promise(async (resolve, reject) => {
       let url: string;
       try {
         url = this.resourceNameToURL(name);
@@ -64,7 +64,7 @@ export class ResourceManager {
         reject(`Couldn't parse resource name to url ${name}`);
       }
       let result = await fetch(url)
-        .then((res)=>res.arrayBuffer())
+        .then((res) => res.arrayBuffer())
         .catch(reject);
       if (result) {
         resolve(new Resource().setArrayBuffer(result));
@@ -73,14 +73,14 @@ export class ResourceManager {
       }
     });
   }
-  hasResource (name: string): boolean {
+  hasResource(name: string): boolean {
     return this.resources.has(name);
   }
-  deleteResource (name: string): ResourceManager {
+  deleteResource(name: string): ResourceManager {
     this.resources.delete(name);
     return this;
   }
-  setResource (name: string, res: Resource): ResourceManager {
+  setResource(name: string, res: Resource): ResourceManager {
     this.resources.set(name, res);
     return this;
   }
@@ -88,13 +88,13 @@ export class ResourceManager {
    * Rejects if resource couldn't be fetched
    * @param name of resource
    */
-  getResource (name: string): Promise<Resource> {
-    return new Promise(async (resolve, reject)=>{
-      let result: Resource|void;
+  getResource(name: string): Promise<Resource> {
+    return new Promise(async (resolve, reject) => {
+      let result: Resource | void;
       if (this.hasResource(name)) {
         result = this.resources.get(name);
       } else {
-        result = await this._loadResource(name).catch((reason)=>{
+        result = await this._loadResource(name).catch((reason) => {
           reject(reason);
         });
       }
@@ -129,10 +129,20 @@ export class ResourceManager {
   // }
 }
 
-export interface Module extends Resource {
+export class Module extends Resource {
+  isLoaded: boolean = false;
+  setLoaded (loaded:boolean): Module {
+    this.isLoaded = loaded;
+    return this;
+  }
+  getLoaded (): boolean {
+    return this.isLoaded;
+  }
 }
 
 export class ModuleManager {
+  static MODULE_RESOURCE_PREFIX = "@";
+  static MODULE_FETCH_PREFIX = "$";
   static SINGLETON: ModuleManager = undefined;
   loadedModules: Map<string, Module>;
   constructor() {
@@ -161,22 +171,51 @@ export class ModuleManager {
     this.loadedModules.set(name, mod);
     return this;
   }
-  getModule(name: string): Module {
-    return this.loadedModules.get(name);
+  async _loadModule (mod: Module) {
+    let pkgJson = await fetch(`${mod.url}/package.json`).then((r)=>r.json());
+    if (pkgJson.main) {
+      let _path = ResourceManager.get().resourceNameToURL(
+        `${mod.url}/${pkgJson.main}`
+      )
+      await import (_path);
+    }
   }
-  listModules (): Array<Module> {
+  getModule(name: string): Promise<Module> {
+    return new Promise(async (resolve, reject) => {
+      if (this.hasModule(name)) {
+        let result: Module = this.loadedModules.get(name);
+        if (!result.getLoaded()) {
+          console.log("Loading not loaded module", name);
+          await this._loadModule (result);
+        }
+        resolve(result);
+      } else {
+        reject("No module is known for ${name}, did you forget to queryModules() ?");
+      }
+    });
+  }
+  listModules(): Array<Module> {
     let result = new Array();
-    this.loadedModules.forEach((v, k)=>{
+    this.loadedModules.forEach((v, k) => {
       result.push(k);
     });
     return result;
   }
-  queryModules (): Promise<any> {
-    return new Promise(async (resolve, reject)=>{
-      let json = await (
+  queryModules(): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      let json = (
         await ResourceManager.get()
-        .getResource("~query.modules")
+          .getResource("~query.modules")
       ).json();
+      console.log(json);
+      let keys = Object.keys(json.data);
+      for (let key of keys) {
+        let mod = new Module();
+        mod.setArrayBuffer(undefined);
+        mod.url = json.data[key];
+        mod.setLoaded(false);
+        this.addModule(key, mod);
+      }
       resolve(json);
     });
   }

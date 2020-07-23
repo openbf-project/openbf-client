@@ -8,7 +8,9 @@ let port: number = 8080;
 let textDec = new TextDecoder();
 let textEnc = new TextEncoder();
 
-let modulesDir = path.join(Deno.cwd(), "build", "resources", "modules");
+let httpRelDir = "build";
+let moduleRelDir = path.join("resources", "modules");
+let modulesDir = path.join(Deno.cwd(), httpRelDir, moduleRelDir);
 
 const server = serve({ port });
 
@@ -39,13 +41,13 @@ function resolveUrl(url: string): string {
   return path.join(Deno.cwd(), "build", url);
 }
 
-async function queryModules(): Promise<Array<string>> {
-  let result: Array<string> = new Array();
+async function queryModules(): Promise<Map<string, string>> {
+  let result: Map<string, string> = new Map();
   try {
     for await (let file of walk(modulesDir)) {
       if (file.isDirectory) {
         if (await exists(path.join(file.path, "package.json"))) {
-          result.push(file.name);
+          result.set(file.name, path.join(moduleRelDir, file.name));
         }
       }
     }
@@ -53,6 +55,12 @@ async function queryModules(): Promise<Array<string>> {
     console.warn("build/resources/modules couldn't be reached", ex);
   }
   return result;
+}
+
+function mapToObject<K,V> (map: Map<K, V>, obj: any) {
+  map.forEach((v, k)=>{
+    obj[k] = v;
+  });
 }
 
 interface JsonQuery {
@@ -72,7 +80,9 @@ function handleJsonQuery(query: string): Promise<Uint8Array> {
 
     switch (query) {
       case "query.modules":
-        resultJson.data = await queryModules();
+        let data = {};
+        mapToObject(await queryModules(), data);
+        resultJson.data = data;
         resultJson.description = "queried modules";
         break;
       default:
