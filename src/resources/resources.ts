@@ -1,6 +1,7 @@
 
 
 import API from "../api.js";
+import { GLTF, GLTFParseResult, GLTFJson, GLTFAllow2_0 } from "./gltf.js";
 const api: API = API.get();
 
 const textDec = new TextDecoder();
@@ -8,6 +9,7 @@ const textDec = new TextDecoder();
 export class Resource {
   arrayBuffer: ArrayBuffer;
   url: string;
+  resourceManager: ResourceManager;
   constructor() {
   }
   setArrayBuffer(ab: ArrayBuffer): Resource {
@@ -16,11 +18,24 @@ export class Resource {
   }
   text(): string {
     let result = textDec.decode(this.arrayBuffer);
-    console.log(result);
     return result;
   }
   json(): any {
     return JSON.parse(this.text());
+  }
+  setResourceManager (manager: ResourceManager): Resource {
+    this.resourceManager = manager;
+    return this;
+  }
+  getResourceManager (): ResourceManager {
+    return this.resourceManager;
+  }
+}
+
+export class ModelResource extends Resource {
+  gltf: GLTFParseResult;
+  constructor () {
+    super();
   }
 }
 
@@ -54,20 +69,22 @@ export class ResourceManager {
   /**Internal - used to load resources
    * @param name of resource
    */
-  _loadResource(name: string): Promise<Resource> {
+  _loadResource(name: string, premadeRes: Resource = undefined): Promise<Resource> {
     return new Promise(async (resolve, reject) => {
       let url: string;
       try {
         url = this.resourceNameToURL(name);
-        console.log(url);
       } catch (ex) {
         reject(`Couldn't parse resource name to url ${name}`);
       }
-      let result = await fetch(url)
+      let data = await fetch(url)
         .then((res) => res.arrayBuffer())
         .catch(reject);
-      if (result) {
-        resolve(new Resource().setArrayBuffer(result));
+      if (data) {
+        let result: Resource = premadeRes;;
+        if (!result) result = new Resource();
+        result.setArrayBuffer(data).setResourceManager(this);
+        resolve(result);
       } else {
         reject("Could not parse resource to array buffer");
       }
@@ -88,13 +105,13 @@ export class ResourceManager {
    * Rejects if resource couldn't be fetched
    * @param name of resource
    */
-  getResource(name: string): Promise<Resource> {
+  getResource(name: string, premadeRes: Resource = undefined): Promise<Resource> {
     return new Promise(async (resolve, reject) => {
-      let result: Resource | void;
+      let result: Resource | void = premadeRes;
       if (this.hasResource(name)) {
         result = this.resources.get(name);
       } else {
-        result = await this._loadResource(name).catch((reason) => {
+        result = await this._loadResource(name, result).catch((reason) => {
           reject(reason);
         });
       }
@@ -105,33 +122,33 @@ export class ResourceManager {
       }
     });
   }
-  // loadModel(fname, parseExtras = false) {
-  //   return new Promise((resolve, reject) => {
-  //     try {
-  //       this.getGLTFLoader().load(fname, (model) => {
-  //         if (parseExtras) {
-  //           model.scene.traverse((child) => {
-  //             this.onParseModelExtras(model, child);
-  //           });
-  //           if (model.animations && model.animations.length > 0) {
-  //             model.scene.userData.animMixer = new AnimationMixer(model.scene);
-  //             model.animations.forEach((clip) => {
-  //               model.scene.userData.animMixer.clipAction(clip).play();
-  //             });
-  //           }
-  //         }
-  //         resolve(model);
-  //       }, undefined, reject);
-  //     } catch (ex) {
-  //       reject(ex);
-  //     }
-  //   });
-  // }
+  getResourceModel (name: string): Promise<ModelResource> {
+    return new Promise(async (resolve, reject)=>{
+      //Create resulting resource
+      let result = new ModelResource();
+      //Get the resource that contains our model data
+      let res = await this.getResource(name, result).catch(reject);
+      if (!res) return;
+      
+      //Parse GLTF
+      result.gltf = !await GLTF.parse(
+        res.arrayBuffer,
+        {
+          allowVersion:GLTFAllow2_0
+        }
+      ).catch(reject);
+      if (!result.gltf) return;
+      resolve(
+        result
+      );
+    });
+  }
 }
 
 export class Module extends Resource {
   isLoaded: boolean = false;
   imps: any;
+  moduleManager: ModuleManager;
   setLoaded (loaded:boolean): Module {
     this.isLoaded = loaded;
     return this;
@@ -145,6 +162,13 @@ export class Module extends Resource {
   }
   getImports (): any {
     return this.imps;
+  }
+  setModuleManager(manager: ModuleManager): Module {
+    this.moduleManager = manager;
+    return this;
+  }
+  getModuleManager(): ModuleManager {
+    return this.moduleManager;
   }
 }
 
@@ -188,6 +212,8 @@ export class ModuleManager {
       let imps = await import (_path);
       mod.setImports(imps);
       mod.setLoaded(true);
+      mod.setModuleManager(this);
+      mod.setResourceManager(ResourceManager.get());
     }
   }
   getModule(name: string): Promise<Module> {
@@ -195,12 +221,11 @@ export class ModuleManager {
       if (this.hasModule(name)) {
         let result: Module = this.loadedModules.get(name);
         if (!result.getLoaded()) {
-          console.log("Loading not loaded module", name);
           await this._loadModule (result);
         }
         resolve(result);
       } else {
-        reject("No module is known for ${name}, did you forget to queryModules() ?");
+        reject(`No module is known for ${name}, did you forget to queryModules() ?`);
       }
     });
   }
@@ -217,7 +242,6 @@ export class ModuleManager {
         await ResourceManager.get()
           .getResource("~query.modules")
       ).json();
-      console.log(json);
       let keys = Object.keys(json.data);
       for (let key of keys) {
         let mod = new Module();

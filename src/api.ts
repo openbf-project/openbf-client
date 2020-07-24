@@ -5,12 +5,7 @@ import { PhysicsEngine } from "./physics/engine.js";
 import { ResourceManager } from "./resources/resources.js";
 import { TimeManager } from "./utils/time.js";
 
-declare class GLTFLoader {
-  constructor (a: any, b:any);
-}
-
-import { ModuleManager } from "./resources/module.js";
-import { Object3D, Geometry } from "./libs/three/Three.js";
+import { ModuleManager } from "./resources/resources.js";
 
 export default class API {
   static SINGLETON: API;
@@ -18,24 +13,14 @@ export default class API {
   renderer: Renderer;
   headless: boolean;
   timeManager: TimeManager;
-  gltfLoader: GLTFLoader;
   moduleManager: ModuleManager;
   resourceManager: ResourceManager;
 
-  onParseModelExtras: (model: Object3D, child: Object3D) => void;
-  constructor() {
-    this.onParseModelExtras = (model, child) => {
-    }
-  }
   setTimeManager(tm: TimeManager) {
     this.timeManager = tm;
   }
   getTimeManager(): TimeManager {
     return this.timeManager;
-  }
-  getGLTFLoader(): GLTFLoader {
-    if (!this.gltfLoader) this.gltfLoader = new GLTFLoader(undefined, this.getHeadless());
-    return this.gltfLoader;
   }
   setHeadless(headless: boolean) {
     this.headless = headless;

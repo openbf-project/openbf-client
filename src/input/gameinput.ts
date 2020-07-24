@@ -51,7 +51,6 @@ export class InputBinding {
   }
   addPadAxisRule(rule: AxisRule): InputBinding {
     if (!(rule instanceof AxisRule)) {
-      console.log(rule);
       throw `${rule} not instanceof AxisRule`;
     }
     if (this.padAxes.has(rule)) throw "Cannot add axis rule twice";
