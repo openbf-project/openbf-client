@@ -10,17 +10,17 @@
 - ✅ Convert to TypeScript ESModules
 - ✅ Get three.js to work
 - ✅ Get three.js ts defs to work
-- ❌ Bring in ammo.js
-- ❌ Bring in GPGPU physics
+- ✅ Bring in ammo.js
+- ❌ Wrap ammo so we don't have to hate ourselves
 - ✅ Get deno up and serving from localhost
 - ✅ Implement resource manager and API
-- ✅ Users space modules now import using Resource API
-- ❌ ModelResource pipeline
-- ❌ Relative module resources
+- ✅ Modules w/ Resource API
+- ❌ Modules w/ relative resources
+- ❌ gltf-ts integrated
+- ❌ ModelResource
 - ❌ SWBF adapter pipe
 - ❌ API docs
 - ❌ Mobile version of `apphost`
-- ❌ Adjust gamepad api usage from electron fixes..
 - ❌ Standard UI (core is there)
 
 ## Running (devs)
