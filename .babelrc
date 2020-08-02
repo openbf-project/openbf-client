@@ -14,7 +14,8 @@
   ],
   "plugins": ["@babel/plugin-transform-typescript"],
   "ignore": [
-    "./src/libs/three/*"
+    "./src/libs/three/*",
+    "ammo.d.ts"
   ]//,
   // "exclude":[
   //   "./src/libs/three/**/*.d.ts"

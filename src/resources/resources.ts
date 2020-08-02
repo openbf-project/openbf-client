@@ -61,7 +61,7 @@ export class ResourceManager {
         break;
       case "~":
         //JSON query
-        console.log(name);
+        // console.log(name);
         break;
     }
     return `${this.resourceTransport}://${this.resourceDomain}/${name}`;
@@ -236,7 +236,7 @@ export class ModuleManager {
     });
     return result;
   }
-  queryModules(): Promise<any> {
+  queryModules(): Promise<Array<string>> {
     return new Promise(async (resolve, reject) => {
       let json = (
         await ResourceManager.get()
@@ -250,7 +250,7 @@ export class ModuleManager {
         mod.setLoaded(false);
         this.addModule(key, mod);
       }
-      resolve(json);
+      resolve(keys);
     });
   }
 }

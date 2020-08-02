@@ -1,16 +1,14 @@
 
-import "./rendering/renderer.js";
 import Renderer from "./rendering/renderer.js";
-import { Ammo } from "./libs/ammo/ammo.wasm.js";
 
 import { ResourceManager } from "./resources/resources.js";
 import { TimeManager } from "./utils/time.js";
-
 import { ModuleManager } from "./resources/resources.js";
+import { PhysicsManager } from "./physics/physics.js";
 
 export default class API {
   static SINGLETON: API;
-  physicsEngine: Ammo.btDiscreteDynamicsWorld;
+  physicsManager: PhysicsManager;
   renderer: Renderer;
   headless: boolean;
   timeManager: TimeManager;
@@ -29,11 +27,11 @@ export default class API {
   getHeadless(): boolean {
     return this.headless;
   }
-  setPhysicsEngine(engine: Ammo.btDiscreteDynamicsWorld) {
-    this.physicsEngine = engine;
+  setPhysicsManager(engine: PhysicsManager) {
+    this.physicsManager = engine;
   }
-  getPhysicsEngine(): Ammo.btDiscreteDynamicsWorld {
-    return this.physicsEngine;
+  getPhysicsManager(): PhysicsManager {
+    return this.physicsManager;
   }
   setRenderer(renderer: Renderer) {
     this.renderer = renderer;

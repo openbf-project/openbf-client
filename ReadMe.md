@@ -4,23 +4,15 @@
 - Active Development
 
 ## Demo Status
-- Active Development
+- Awaiting gltf-ts integration
 
-### Rework status
-- ✅ Convert to TypeScript ESModules
-- ✅ Get three.js to work
-- ✅ Get three.js ts defs to work
-- ✅ Bring in ammo.js
-- ❌ Wrap ammo so we don't have to hate ourselves
-- ✅ Get deno up and serving from localhost
-- ✅ Implement resource manager and API
-- ✅ Modules w/ Resource API
-- ❌ Modules w/ relative resources
-- ❌ gltf-ts integrated
+### Tracked missing features
+- ❌ Modules importing resources relative to themselves / other modules
+- ❌ gltf-ts integration
 - ❌ ModelResource
 - ❌ SWBF adapter pipe
 - ❌ API docs
-- ❌ Mobile version of `apphost`
+- ❌ Mobile version of apphost
 - ❌ Standard UI (core is there)
 
 ## Running (devs)

@@ -8,6 +8,7 @@ import Renderer from "./rendering/renderer.js";
 import { TimeManager } from "./utils/time.js";
 import { ModuleManager, ResourceManager } from "./resources/resources.js";
 import { GameInput, AxisRule } from "./input/gameinput.js";
+import { PhysicsManager } from "./physics/physics.js";
 
 const api = API.get();
 let input = GameInput.get();
@@ -48,20 +49,16 @@ function setupDefaultInput() {
 
   input.createBinding("steer-down")
     .createPadAxisRule(4, AxisRule.GREATER_THAN, 0.5);
-  
+
 }
 
 setupDefaultInput();
 
 api.setRenderer(new Renderer());
-
 api.setTimeManager(new TimeManager().start());
-
 api.setHeadless(false);
-
 let container = new Component()
   .useNative(get("container"));
-
 api.getRenderer().mount(container);
 
 on(window, "resize", () => {
@@ -69,36 +66,38 @@ on(window, "resize", () => {
 });
 
 api.renderer.resize(container.rect.width, container.rect.height);
-api.renderer.defaultCamera.position.set(0, 10, 40);
 api.renderer.useDefaultCamera();
 api.renderer.start();
 
-setTimeout(() => {
-  api.getTimeManager().listen((delta) => {
-    if (input.getButton("forward")) {
-      api.renderer.camera.position.z -= 0.5;
-    } else if (input.getButton("backward")) {
-      api.renderer.camera.position.z += 0.5;
-    }
-    if (input.getButton("left")) {
-      api.renderer.camera.position.x -= 0.5;
-    } else if (input.getButton("right")) {
-      api.renderer.camera.position.x += 0.5;
-    }
-  });
-}, 100);
+const physics = new PhysicsManager();
+api.setPhysicsManager(physics);
 
-let resourceManager = ResourceManager.get();
-api.setResourceManager(resourceManager);
+async function userLand() {
+  //Load up physics engine
+  await physics.init(); //Can throw if physics error, this is fine
 
-let moduleManager = ModuleManager.get();
-api.setModuleManager(moduleManager);
+  //Prepare resources to load
+  let resourceManager = ResourceManager.get();
+  api.setResourceManager(resourceManager);
 
-moduleManager.queryModules().then((json) => {
-  let keys = Object.keys(json.data);
-  for (let key of keys) {
-    moduleManager.getModule(key).then((mod) => {
-      console.log("Loaded mod", mod);
-    });
+  //Prepare modules to load
+  let moduleManager = ModuleManager.get();
+  api.setModuleManager(moduleManager);
+
+  //Prepares user modules resources (lazy load)
+  let resources = await moduleManager.queryModules();
+
+  //Actually loads the modules if they aren't loaded
+  for (let name of resources) {
+    //You can perform getModule(key) without fear of duplication
+    let mod = await moduleManager.getModule(name);
+    console.log("Loaded module", mod);
   }
-});
+
+  api.getTimeManager().listen((delta) => {
+    physics.step(delta);
+  });
+}
+
+//Async!
+userLand();
