@@ -7,6 +7,7 @@ let radians = (degrees: number): number => degrees * (Math.PI / 180);
 let degrees = (radians: number): number => radians * (180 / Math.PI);
 export const VEC3_RIGHT = new Vector3(0, 1, 0);
 export const RAD_90 = radians(90);
+export const RAD_180 = radians(180);
 
 export class LookCamera {
   camera: PerspectiveCamera;
