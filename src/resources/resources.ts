@@ -10,6 +10,9 @@ const textDec = new TextDecoder();
 //This will be replaced by gltf-ts when it is ready
 const gltfLoader = new GLTFLoader();
 
+//Because babel is fucking stupid
+const MODULE_DEF_JSON_NAME = "module.json";
+
 export class Resource {
   isLoaded: boolean = false;
   arrayBuffer: ArrayBuffer;
@@ -212,7 +215,7 @@ export class ModuleManager {
     return this;
   }
   async _loadModule(mod: Module) {
-    let pkgJson = await fetch(`${mod.url}/package.json`).then((r) => r.json());
+    let pkgJson = await fetch(`${mod.url}/${MODULE_DEF_JSON_NAME}`).then((r) => r.json());
     if (pkgJson.main) {
       let _path = ResourceManager.get().resourceNameToURL(
         `${mod.url}/${pkgJson.main}`

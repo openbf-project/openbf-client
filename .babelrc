@@ -10,14 +10,19 @@
         "spec":true,
         "modules":false
       }
-    ]
+    ],
+    "@babel/preset-typescript"
   ],
-  "plugins": ["@babel/plugin-transform-typescript"],
+  "include":[
+    "*",
+    "./src/resources/modules/default/index.ts"
+  ],
   "ignore": [
     "./src/libs/three/*",
     "ammo.d.ts"
-  ]//,
-  // "exclude":[
-  //   "./src/libs/three/**/*.d.ts"
-  // ]
+  ],
+  "exclude":[
+    // "./src/libs/three/**/*.d.ts"
+    "package.json"
+  ]
 }

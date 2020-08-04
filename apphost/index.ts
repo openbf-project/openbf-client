@@ -12,6 +12,8 @@ let httpRelDir = "build";
 let moduleRelDir = path.join("resources", "modules");
 let modulesDir = path.join(Deno.cwd(), httpRelDir, moduleRelDir);
 
+const MODULE_DEF_JSON_NAME = "module.json";
+
 const server = serve({ port });
 
 console.log(`http://localhost:${port}/`);
@@ -46,7 +48,7 @@ async function queryModules(): Promise<Map<string, string>> {
   try {
     for await (let file of walk(modulesDir)) {
       if (file.isDirectory) {
-        if (await exists(path.join(file.path, "package.json"))) {
+        if (await exists(path.join(file.path, MODULE_DEF_JSON_NAME))) {
           result.set(file.name, path.join(moduleRelDir, file.name));
         }
       }
