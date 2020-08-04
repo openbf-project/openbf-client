@@ -91,7 +91,7 @@ async function userLand() {
   for (let name of resources) {
     //You can perform getModule(key) without fear of duplication
     let mod = await moduleManager.getModule(name);
-    console.log("Loaded module", mod);
+    // console.log("Loaded module", mod);
   }
 
   api.getTimeManager().listen((delta) => {

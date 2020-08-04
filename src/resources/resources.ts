@@ -1,16 +1,28 @@
 
+import { Scene, Object3D } from "../libs/three/Three.js";
+import { GLTFLoader } from "../libs/three-gltf/GLTFLoader.js";
 
 import API from "../api.js";
-import { GLTF, GLTFParseResult, GLTFJson, GLTFAllow2_0 } from "./gltf.js";
 const api: API = API.get();
 
 const textDec = new TextDecoder();
 
+//This will be replaced by gltf-ts when it is ready
+const gltfLoader = new GLTFLoader();
+
 export class Resource {
+  isLoaded: boolean = false;
   arrayBuffer: ArrayBuffer;
   url: string;
   resourceManager: ResourceManager;
   constructor() {
+  }
+  setLoaded(loaded: boolean): Resource {
+    this.isLoaded = loaded;
+    return this;
+  }
+  getLoaded(): boolean {
+    return this.isLoaded;
   }
   setArrayBuffer(ab: ArrayBuffer): Resource {
     this.arrayBuffer = ab;
@@ -23,18 +35,19 @@ export class Resource {
   json(): any {
     return JSON.parse(this.text());
   }
-  setResourceManager (manager: ResourceManager): Resource {
+  setResourceManager(manager: ResourceManager): Resource {
     this.resourceManager = manager;
     return this;
   }
-  getResourceManager (): ResourceManager {
+  getResourceManager(): ResourceManager {
     return this.resourceManager;
   }
 }
 
 export class ModelResource extends Resource {
-  gltf: GLTFParseResult;
-  constructor () {
+  scenes: Array<Object3D>;
+
+  constructor() {
     super();
   }
 }
@@ -57,11 +70,18 @@ export class ResourceManager {
   resourceNameToURL(name: string, mod: Module | undefined = undefined): string {
     switch (name.charAt(0)) {
       case ModuleManager.MODULE_RESOURCE_PREFIX:
-        //Relative to module/resources
-        break;
-      case "~":
-        //JSON query
-        // console.log(name);
+        let sepInd = name.indexOf(":");
+        if (sepInd > 0) {
+          let modName = name.substring(1, sepInd);
+          name = name.substring(1 + sepInd);
+          if (ModuleManager.get().hasModule(modName)) {
+            let mod = ModuleManager.get().loadedModules.get(modName);
+            name = `${mod.url}${name}`;
+            break;
+          } else {
+            throw `cannot get relative resource of module before module is queryed or loaded ${modName}`;
+          }
+        }
         break;
     }
     return `${this.resourceTransport}://${this.resourceDomain}/${name}`;
@@ -83,6 +103,7 @@ export class ResourceManager {
       if (data) {
         let result: Resource = premadeRes;;
         if (!result) result = new Resource();
+        result.url = url;
         result.setArrayBuffer(data).setResourceManager(this);
         resolve(result);
       } else {
@@ -122,45 +143,32 @@ export class ResourceManager {
       }
     });
   }
-  getResourceModel (name: string): Promise<ModelResource> {
-    return new Promise(async (resolve, reject)=>{
-      //Create resulting resource
-      let result = new ModelResource();
-      //Get the resource that contains our model data
-      let res = await this.getResource(name, result).catch(reject);
+  getResourceModel(name: string): Promise<ModelResource> {
+    return new Promise(async (resolve, reject) => {
+      let res = await this.getResource(name).catch(reject) as ModelResource;
       if (!res) return;
-      
-      //Parse GLTF
-      result.gltf = !await GLTF.parse(
-        res.arrayBuffer,
-        {
-          allowVersion:GLTFAllow2_0
-        }
-      ).catch(reject);
-      if (!result.gltf) return;
-      resolve(
-        result
-      );
+
+      if (res.getLoaded()) {
+        resolve(res);
+      } else {
+        gltfLoader.load(res.url, (gltf) => {
+          res.scenes = gltf.scenes;
+          resolve(res);
+        }, undefined, reject);
+      }
+
     });
   }
 }
 
 export class Module extends Resource {
-  isLoaded: boolean = false;
   imps: any;
   moduleManager: ModuleManager;
-  setLoaded (loaded:boolean): Module {
-    this.isLoaded = loaded;
-    return this;
-  }
-  getLoaded (): boolean {
-    return this.isLoaded;
-  }
-  setImports (imps: any): Module {
+  setImports(imps: any): Module {
     this.imps = imps;
     return this;
   }
-  getImports (): any {
+  getImports(): any {
     return this.imps;
   }
   setModuleManager(manager: ModuleManager): Module {
@@ -203,13 +211,13 @@ export class ModuleManager {
     this.loadedModules.set(name, mod);
     return this;
   }
-  async _loadModule (mod: Module) {
-    let pkgJson = await fetch(`${mod.url}/package.json`).then((r)=>r.json());
+  async _loadModule(mod: Module) {
+    let pkgJson = await fetch(`${mod.url}/package.json`).then((r) => r.json());
     if (pkgJson.main) {
       let _path = ResourceManager.get().resourceNameToURL(
         `${mod.url}/${pkgJson.main}`
       )
-      let imps = await import (_path);
+      let imps = await import(_path);
       mod.setImports(imps);
       mod.setLoaded(true);
       mod.setModuleManager(this);
@@ -221,7 +229,7 @@ export class ModuleManager {
       if (this.hasModule(name)) {
         let result: Module = this.loadedModules.get(name);
         if (!result.getLoaded()) {
-          await this._loadModule (result);
+          await this._loadModule(result);
         }
         resolve(result);
       } else {
