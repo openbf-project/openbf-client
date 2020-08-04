@@ -7,9 +7,7 @@
 - Awaiting gltf-ts integration
 
 ### Tracked missing features
-- ❌ Modules importing resources relative to themselves / other modules
-- ❌ gltf-ts integration
-- ❌ ModelResource
+- ❌ gltf-ts integration (using gltfloader as fallback in mean time)
 - ❌ SWBF adapter pipe
 - ❌ API docs
 - ❌ Mobile version of apphost
