@@ -2,7 +2,7 @@
 import { serve } from "https://deno.land/std/http/server.ts";
 import { Status } from "https://deno.land/std/http/http_status.ts";
 import * as path from "https://deno.land/std/path/mod.ts";
-import { walk, exists } from "https://deno.land/std/fs/mod.ts";
+import { walk, exists, ensureDirSync } from "https://deno.land/std/fs/mod.ts";
 
 let port: number = 8080;
 let textDec = new TextDecoder();
@@ -47,6 +47,7 @@ function resolveUrl(url: string): string {
 async function queryModules(): Promise<Map<string, string>> {
   let result: Map<string, string> = new Map();
   try {
+    ensureDirSync(modulesDir);
     for await (let file of walk(modulesDir)) {
       if (file.isDirectory) {
         if (await exists(path.join(file.path, MODULE_DEF_JSON_NAME))) {

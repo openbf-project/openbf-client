@@ -8,7 +8,11 @@ module.exports = {
   plugins: [
     new CopyWebpackPlugin({
       patterns: [
-        { from: 'src/index.html', to: 'index.html' }
+        { from: 'src/index.html', to: 'index.html' },
+        { from: 'src/libs/ammo/ammo.wasm.js', to: 'libs/ammo/ammo.wasm.js' },
+        { from: 'src/libs/ammo/ammo.wasm.wasm', to: 'libs/ammo/ammo.wasm.wasm' },
+        { from: 'src/icon.png', to: 'icon.png' },
+        { from: 'src/index.css', to: 'index.css' }
       ],
     })
   ],
@@ -22,6 +26,9 @@ module.exports = {
   module: {
     rules: [
       {
+        exclude: [
+          path.resolve(__dirname, "openbf-default-mods")
+        ],
         test: /\.ts$/,
         use: {
           loader: "babel-loader",

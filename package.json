@@ -34,17 +34,6 @@
     "plugins": [
       "transform-class-properties",
       "@babel/plugin-transform-runtime"
-    ],
-    "include": [
-      "*",
-      "./src/resources/modules/default/index.ts"
-    ],
-    "ignore": [
-      "./src/libs/three/*",
-      "ammo.d.ts"
-    ],
-    "exclude": [
-      "package.json"
     ]
   },
   "dependencies": {
