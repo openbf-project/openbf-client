@@ -1,6 +1,6 @@
 
 import { Object3D, Vector3, PerspectiveCamera } from "../../../libs/three/Three.js";
-import API from "../../../api.js";
+import API from "../../../api";
 const api = API.get();
 
 let radians = (degrees: number): number => degrees * (Math.PI / 180);

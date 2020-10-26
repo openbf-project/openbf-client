@@ -1,11 +1,11 @@
 
-import Component from "./component.js";
+import Component from "./component";
 import {
   Camera,
   WebGLRenderer,
   Scene,
   PerspectiveCamera
-} from "../libs/three/Three.js";
+} from "../libs/three/Three";
 
 export default class Renderer extends Component {
   webgl: WebGLRenderer;

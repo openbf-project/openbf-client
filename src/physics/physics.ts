@@ -1,5 +1,5 @@
 
-import { Object3D } from "../libs/three/Three.js";
+import { Object3D } from "../libs/three/Three";
 
 /**A helper class because working with Ammo is UGH*/
 export class Body {

@@ -1,6 +1,6 @@
 
-import { Input } from "./input.js";
-import { on, off } from "../aliases.js";
+import { Input } from "./input";
+import { on, off } from "../aliases";
 
 export class InputBinding {
   keys: Set<string>;

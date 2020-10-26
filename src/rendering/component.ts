@@ -1,5 +1,7 @@
 
-import { on, off, make, rect } from  "../aliases.js";
+/**TODO - remove as will be duplicated when @repcomm/exponent-ts installed w/ npm */
+
+import { on, off, make, rect } from  "../aliases";
 
 /**
  * @author Jonathan Crowder

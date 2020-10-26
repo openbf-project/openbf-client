@@ -2,7 +2,7 @@
 import { Scene, Object3D } from "../libs/three/Three.js";
 import { GLTFLoader } from "../libs/three-gltf/GLTFLoader.js";
 
-import API from "../api.js";
+import API from "../api";
 const api: API = API.get();
 
 const textDec = new TextDecoder();
@@ -152,16 +152,22 @@ export class ResourceManager {
       if (!res) return;
 
       if (res.getLoaded()) {
+        console.log("already loaded", name);
         resolve(res);
       } else {
+        console.log("Haven't loaded", name, "yet");
         gltfLoader.load(res.url, (gltf) => {
           res.scenes = gltf.scenes;
           resolve(res);
         }, undefined, reject);
+        res.setLoaded(true);
       }
 
     });
   }
+  // getResourceWorld (name: string): Promise<WorldResource> {
+
+  // }
 }
 
 export class Module extends Resource {
@@ -263,5 +269,11 @@ export class ModuleManager {
       }
       resolve(keys);
     });
+  }
+}
+
+export class WorldResource extends Resource {
+  constructor () {
+    super();
   }
 }

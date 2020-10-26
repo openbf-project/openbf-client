@@ -1,5 +1,5 @@
 
-import { on, off } from "../aliases.js";
+import { on, off } from "../aliases";
 
 interface InputPointerState {
   x: number;

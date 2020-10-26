@@ -24,6 +24,7 @@ function getContentType(fname: string): string {
     case ".html":
       return "text/html; charset=UTF-8";
     case ".js":
+      console.log(fname, "is javascript text file");
       return "text/javascript";
     case ".css":
       return "text/css";

@@ -1,10 +1,10 @@
 
-import Renderer from "./rendering/renderer.js";
+import Renderer from "./rendering/renderer";
 
-import { ResourceManager } from "./resources/resources.js";
-import { TimeManager } from "./utils/time.js";
-import { ModuleManager } from "./resources/resources.js";
-import { PhysicsManager } from "./physics/physics.js";
+import { ResourceManager } from "./resources/resources";
+import { TimeManager } from "./utils/time";
+import { ModuleManager } from "./resources/resources";
+import { PhysicsManager } from "./physics/physics";
 
 export default class API {
   static SINGLETON: API;

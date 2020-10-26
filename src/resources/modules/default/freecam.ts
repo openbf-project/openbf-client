@@ -1,10 +1,10 @@
 
-import { LookCamera, VEC3_RIGHT, RAD_90 } from "./lookcamera.js";
+import { LookCamera, VEC3_RIGHT, RAD_90 } from "./lookcamera";
 
-import API from "../../../api.js";
+import API from "../../../api";
 const api = API.get();
 
-import { GameInput } from "../../../input/gameinput.js";
+import { GameInput } from "../../../input/gameinput";
 const input = GameInput.get();
 
 export class FreeCam extends LookCamera {

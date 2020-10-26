@@ -1,14 +1,14 @@
 
-import { get, on } from "./aliases.js";
-import Component from "./rendering/component.js";
+import { get, on } from "./aliases";
+import Component from "./rendering/component";
 
-import API from "./api.js";
+import API from "./api";
 
-import Renderer from "./rendering/renderer.js";
-import { TimeManager } from "./utils/time.js";
-import { ModuleManager, ResourceManager } from "./resources/resources.js";
-import { GameInput, AxisRule } from "./input/gameinput.js";
-import { PhysicsManager } from "./physics/physics.js";
+import Renderer from "./rendering/renderer";
+import { TimeManager } from "./utils/time";
+import { ModuleManager, ResourceManager } from "./resources/resources";
+import { GameInput, AxisRule } from "./input/gameinput";
+import { PhysicsManager } from "./physics/physics";
 
 const api = API.get();
 let input = GameInput.get();

@@ -1,31 +1,53 @@
 {
   "name": "openbf-ts",
   "version": "1.0.0",
-  "description": "OpenBF client - written in ts for esm",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/RepComm/openbf-ts.git"
+  "description": "OpenBF",
+  "scripts": {
+    "build": "npx webpack"
   },
   "keywords": [
     "typescript",
     "esmodules",
     "babel",
+    "webpack",
     "openbf"
   ],
-  "author": "Jonathan Crowder",
+  "author": "RepComm",
   "license": "Unlicense",
-  "bugs": {
-    "url": "https://github.com/openbf-project/openbf-ts/issues"
-  },
   "homepage": "https://github.com/openbf-project/openbf-ts#readme",
   "devDependencies": {
-    "@babel/cli": "^7.10.5",
-    "@babel/core": "^7.10.5",
-    "@babel/preset-env": "^7.10.4",
-    "@babel/preset-typescript": "^7.10.4"
+    "@babel/core": "^7.12.3",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/preset-typescript": "^7.12.1",
+    "babel-loader": "^8.1.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "copy-webpack-plugin": "^6.2.1",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12"
   },
-  "scripts": {
-    "build": "babel src --extensions '.ts' --copy-files -d apphost/build"
+  "private": true,
+  "babel": {
+    "presets": [
+      "@babel/preset-env",
+      "@babel/preset-typescript"
+    ],
+    "plugins": [
+      "transform-class-properties",
+      "@babel/plugin-transform-runtime"
+    ],
+    "include": [
+      "*",
+      "./src/resources/modules/default/index.ts"
+    ],
+    "ignore": [
+      "./src/libs/three/*",
+      "ammo.d.ts"
+    ],
+    "exclude": [
+      "package.json"
+    ]
+  },
+  "dependencies": {
+    "@babel/plugin-transform-runtime": "^7.12.1"
   }
 }

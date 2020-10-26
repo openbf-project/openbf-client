@@ -1,1 +1,1 @@
-deno run --allow-net --allow-read --unstable ./index.ts
+deno run -c tsconfig.json --allow-net --allow-read --unstable ./index.ts
