@@ -24,11 +24,13 @@ function getContentType(fname: string): string {
     case ".html":
       return "text/html; charset=UTF-8";
     case ".js":
-      console.log(fname, "is javascript text file");
       return "text/javascript";
     case ".css":
       return "text/css";
+    case ".json":
+      return "application/json";
     default:
+      console.log(fname, "unrecognized extension!");
       return "text/plain";
   }
 }
@@ -102,7 +104,7 @@ function handleJsonQuery(query: string): Promise<Uint8Array> {
 
 for await (const req of server) {
   let rpath = resolveUrl(req.url);
-  console.log("serve", rpath);
+  console.log("[req]", rpath);
 
   let headers = new Headers();
 
@@ -122,5 +124,6 @@ for await (const req of server) {
     req.respond({
       status: Status.NotFound
     });
+    console.log("[404]", rpath);
   }
 }

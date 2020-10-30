@@ -11,7 +11,14 @@ import { GameInput, AxisRule } from "./input/gameinput";
 import { PhysicsManager } from "./physics/physics";
 
 const api = API.get();
+window["API"] = API;
+
+import * as THREE from "./libs/three/Three.js";
+
+API.THREE = THREE;
+API.GameInput = GameInput;
 let input = GameInput.get();
+api.setInputManager(input);
 
 function setupDefaultInput() {
   input.createBinding("escape")
@@ -62,12 +69,12 @@ let container = new Component()
 api.getRenderer().mount(container);
 
 on(window, "resize", () => {
-  api.renderer.resize(container.rect.width, container.rect.height);
+  api.getRenderer().resize(container.rect.width, container.rect.height);
 });
 
-api.renderer.resize(container.rect.width, container.rect.height);
-api.renderer.useDefaultCamera();
-api.renderer.start();
+api.getRenderer().resize(container.rect.width, container.rect.height);
+api.getRenderer().useDefaultCamera();
+api.getRenderer().start();
 
 const physics = new PhysicsManager();
 api.setPhysicsManager(physics);

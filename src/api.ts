@@ -5,16 +5,26 @@ import { ResourceManager } from "./resources/resources";
 import { TimeManager } from "./utils/time";
 import { ModuleManager } from "./resources/resources";
 import { PhysicsManager } from "./physics/physics";
+import { GameInput } from "./input/gameinput";
 
 export default class API {
   static SINGLETON: API;
-  physicsManager: PhysicsManager;
-  renderer: Renderer;
-  headless: boolean;
-  timeManager: TimeManager;
-  moduleManager: ModuleManager;
-  resourceManager: ResourceManager;
-
+  private physicsManager: PhysicsManager;
+  private renderer: Renderer;
+  private headless: boolean;
+  private timeManager: TimeManager;
+  private moduleManager: ModuleManager;
+  private resourceManager: ResourceManager;
+  private input: GameInput;
+  static GameInput: typeof GameInput;
+  static THREE: any; //TODO
+  
+  getInputManager (): GameInput {
+    return this.input;
+  }
+  setInputManager(im: GameInput) {
+    this.input = im;
+  }
   setTimeManager(tm: TimeManager) {
     this.timeManager = tm;
   }

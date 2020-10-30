@@ -226,7 +226,8 @@ export class ModuleManager {
       let _path = ResourceManager.get().resourceNameToURL(
         `${mod.url}/${pkgJson.main}`
       )
-      let imps = await import(_path);
+      //fixes dynamic mod loading in webpack
+      let imps = await import(/*webpackIgnore: true*/_path);
       mod.setImports(imps);
       mod.setLoaded(true);
       mod.setModuleManager(this);
