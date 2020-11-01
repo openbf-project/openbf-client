@@ -29,6 +29,10 @@ function getContentType(fname: string): string {
       return "text/css";
     case ".json":
       return "application/json";
+    case ".wasm":
+      return "application/wasm";
+    case ".svg":
+      return "image/svg+xml";
     default:
       console.log(fname, "unrecognized extension!");
       return "text/plain";

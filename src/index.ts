@@ -1,6 +1,6 @@
 
 import { get, on } from "./aliases";
-import Component from "./rendering/component";
+import { Component, OverlayPanel, Grid, ImagePanel, runOnce } from "@repcomm/exponent-ts";
 
 import API from "./api";
 
@@ -9,6 +9,9 @@ import { TimeManager } from "./utils/time";
 import { ModuleManager, ResourceManager } from "./resources/resources";
 import { GameInput, AxisRule } from "./input/gameinput";
 import { PhysicsManager } from "./physics/physics";
+
+//Inject exponent css
+runOnce();
 
 const api = API.get();
 window["API"] = API;
@@ -66,7 +69,26 @@ api.setTimeManager(new TimeManager().start());
 api.setHeadless(false);
 let container = new Component()
   .useNative(get("container"));
-api.getRenderer().mount(container);
+
+let root = new OverlayPanel()
+.mount(container) as OverlayPanel;
+
+//TODO - make HUD a panel, and handle content with default mods
+const hud = new Grid()
+.setColumnCount(3)
+.setRowCount(3);
+
+hud.setCell(
+  new ImagePanel()
+  .setImage("./images/hud.svg")
+  .styleItem("background-repeat", "no-repeat")
+  .styleItem("background-position", "50% 0%") as ImagePanel,
+  1, 1, 4
+);
+
+root.setElements(hud, api.getRenderer());
+
+// api.getRenderer().mount(container);
 
 on(window, "resize", () => {
   api.getRenderer().resize(container.rect.width, container.rect.height);

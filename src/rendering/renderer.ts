@@ -1,5 +1,6 @@
 
-import Component from "./component";
+import { Component } from "@repcomm/exponent-ts";
+
 import {
   Camera,
   WebGLRenderer,

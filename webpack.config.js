@@ -12,7 +12,8 @@ module.exports = {
         { from: 'src/libs/ammo/ammo.wasm.js', to: 'libs/ammo/ammo.wasm.js' },
         { from: 'src/libs/ammo/ammo.wasm.wasm', to: 'libs/ammo/ammo.wasm.wasm' },
         { from: 'src/icon.png', to: 'icon.png' },
-        { from: 'src/index.css', to: 'index.css' }
+        { from: 'src/index.css', to: 'index.css' },
+        { from: 'src/images/hud.svg', to: 'images/hud.svg' }
       ],
     })
   ],

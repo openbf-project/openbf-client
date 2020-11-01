@@ -37,6 +37,7 @@
     ]
   },
   "dependencies": {
-    "@babel/plugin-transform-runtime": "^7.12.1"
+    "@babel/plugin-transform-runtime": "^7.12.1",
+    "@repcomm/exponent-ts": "^1.0.9"
   }
 }
