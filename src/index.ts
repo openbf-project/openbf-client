@@ -1,13 +1,12 @@
 
-import { get, on } from "./aliases";
-import { Component, OverlayPanel, Grid, ImagePanel, runOnce } from "@repcomm/exponent-ts";
+import { Component, OverlayPanel, Grid, ImagePanel, runOnce, get, on } from "@repcomm/exponent-ts";
 
 import API from "./api";
 
 import Renderer from "./rendering/renderer";
 import { TimeManager } from "./utils/time";
 import { ModuleManager, ResourceManager } from "./resources/resources";
-import { GameInput, AxisRule } from "./input/gameinput";
+import { GameInput, AxisRule } from "@repcomm/gameinput-ts";
 import { PhysicsManager } from "./physics/physics";
 
 //Inject exponent css

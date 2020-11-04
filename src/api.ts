@@ -5,7 +5,7 @@ import { ResourceManager } from "./resources/resources";
 import { TimeManager } from "./utils/time";
 import { ModuleManager } from "./resources/resources";
 import { PhysicsManager } from "./physics/physics";
-import { GameInput } from "./input/gameinput";
+import { GameInput } from "@repcomm/gameinput-ts";
 
 export default class API {
   static SINGLETON: API;
