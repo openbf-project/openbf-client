@@ -1,29 +1,29 @@
-
 body {
-  width:100vw;
-  height:100vh;
-  overflow:hidden;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 #container {
-  position:absolute;
-  top:0px;
-  left:0px;
-  margin:0px;
-  width:100%;
-  height:100%;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  margin: 0px;
+  width: 100%;
+  height: 100%;
 }
 
 .bg {
-  background-color:rgb(36, 36, 36);
+  background-color: rgb(36, 36, 36);
 }
 
 .ui {
-  color:rgb(128, 128, 128);
+  color: rgb(128, 128, 128);
 }
 
 .transparent {
-  background:none;
+  background: none;
 }
 
 .button {
@@ -34,32 +34,69 @@ body {
   border-width: thin;
   padding: 0.3em 0.5em 0.3em 0.5em;
   border-radius: 0.5em;
-  cursor:pointer;
+  cursor: pointer;
 }
 
-.panel {
-
-}
+.panel {}
 
 .absolute {
-  position:absolute;
-  top:0%;
-  left:0%;
+  position: absolute;
+  top: 0%;
+  left: 0%;
 }
 
 .fill-width {
-  width:100%;
+  width: 100%;
 }
 
 .fill-height {
-  height:100%;
+  height: 100%;
 }
 
 .fill {
-  width:100%;
-  height:100%;
+  width: 100%;
+  height: 100%;
 }
 
 .label {
-  display:block;
+  display: block;
 }
+
+.main-menu {
+  background-color: #021d48;
+  border-color: #4f7796;
+  border-width: 2px;
+  border-style: solid;
+  clip-path: polygon(0 13%, 8% 0, 75% 0, 100% 50%, 75% 100%, 0 100%);
+  color: white;
+  font-family: 'Courier New', Courier, monospace;
+  transform: rotateX(20deg) rotateY(15deg);
+  text-indent: 4%;
+}
+
+.main-menu-header {
+  background-color: #ff7a06;
+  border-color: #eae6d8;
+  border-style: solid;
+  border-width: 3px;
+  color: black;
+  /* height: 2em; */
+  text-indent: 6%;
+  font-size:x-large;
+  font-weight: bold;
+}
+
+.main-menu-item {
+  border-width: 2px;
+  border-color: #4f7796;
+  border-style: none none solid none;
+  transition: all 0.5s cubic-bezier(0.08, 0.82, 0.17, 1);
+  cursor: pointer;
+  font-size:x-large;
+}
+
+.main-menu-item:hover {
+  background-color: #7d889b;
+}
+
+.map-select {}

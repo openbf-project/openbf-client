@@ -1,5 +1,5 @@
 
-import { Component, OverlayPanel, Grid, ImagePanel, runOnce, get, on } from "@repcomm/exponent-ts";
+import { Component, OverlayPanel, Grid, ImagePanel, runOnce, get, on, Panel, make } from "@repcomm/exponent-ts";
 
 import API from "./api";
 
@@ -79,15 +79,75 @@ const hud = new Grid()
 
 hud.setCell(
   new ImagePanel()
-  .setImage("./images/hud.svg")
+  .setImage("./images/openbf-title.svg")
   .styleItem("background-repeat", "no-repeat")
-  .styleItem("background-position", "50% 0%") as ImagePanel,
-  1, 1, 4
+  .styleItem("transform", "rotateX(20deg) rotateY(15deg)")
+  .styleItem("background-position", "50% 100%"),
+  2, 1
 );
 
 root.setElements(hud, api.getRenderer());
 
-// api.getRenderer().mount(container);
+class ButtonList extends Panel {
+  header: ButtonListHeader;
+  mods: Array<ButtonListItem>;
+  constructor () {
+    super();
+    this.header = new ButtonListHeader().textContent("text").mount(this);
+  }
+  addItem (item: ButtonListItem): this {
+    this.mountChild(item);
+    return this;
+  }
+  createItem (name: string): ButtonListItem {
+    let item = new ButtonListItem().textContent(name);
+    this.addItem(item);
+    return item;
+  }
+  getHeader (): Component {
+    return this.header;
+  }
+}
+
+class ButtonListHeader extends Component {
+  text: Component;
+  constructor () {
+    super();
+    this.make("div");
+    this.text = new Component().make("span").textContent("text").mount(this);
+  }
+  textContent (text: string): this {
+    this.text.textContent(text);
+    return this;
+  }
+}
+
+class ButtonListItem extends Component {
+  text: Component;
+  constructor () {
+    super();
+    this.make("div");
+    this.text = new Component().make("span").textContent("text").mount(this);
+  }
+  textContent (text: string): this {
+    this.text.textContent(text);
+    return this;
+  }
+}
+
+let mainMenu = new ButtonList().addClasses("main-menu");
+mainMenu.getHeader()
+.addClasses("main-menu-header")
+.textContent("MAIN MENU");
+
+mainMenu.createItem("SINGLEPLAYER").addClasses("main-menu-item");
+mainMenu.createItem("MULTIPLAYER").addClasses("main-menu-item");
+mainMenu.createItem("SETTINGS").addClasses("main-menu-item");
+mainMenu.createItem("PROFILES").addClasses("main-menu-item");
+mainMenu.createItem("MODULES").addClasses("main-menu-item");
+
+
+hud.setCell(mainMenu, 2, 2);
 
 on(window, "resize", () => {
   api.getRenderer().resize(container.rect.width, container.rect.height);
