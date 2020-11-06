@@ -1,5 +1,5 @@
 
-import { Object3D } from "../libs/three/Three";
+import { Object3D } from "three";
 
 /**A helper class because working with Ammo is UGH*/
 export class Body {
@@ -96,7 +96,7 @@ export class PhysicsManager {
     if (!PhysicsManager.SINGLETON) PhysicsManager.SINGLETON = new PhysicsManager();
     return PhysicsManager.SINGLETON;
   }
-  bodies: Set<Body>;
+  private bodies: Set<Body>;
   ammoIsReady: boolean = false;
   ammoColConfig: Ammo.btDefaultCollisionConfiguration;
   ammoDispatcher: Ammo.btCollisionDispatcher;

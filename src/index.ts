@@ -15,9 +15,9 @@ runOnce();
 const api = API.get();
 window["API"] = API;
 
-import * as THREE from "./libs/three/Three.js";
-
+import * as THREE from "three";
 API.THREE = THREE;
+
 API.GameInput = GameInput;
 let input = GameInput.get();
 api.setInputManager(input);

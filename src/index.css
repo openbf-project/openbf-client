@@ -97,6 +97,7 @@ body {
 
 .main-menu-item:hover {
   background-color: #7d889b;
+  text-indent: 8%;
 }
 
 .map-select {}

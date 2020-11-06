@@ -6,7 +6,7 @@ import {
   WebGLRenderer,
   Scene,
   PerspectiveCamera
-} from "../libs/three/Three";
+} from "three";
 
 export default class Renderer extends Component {
   webgl: WebGLRenderer;
@@ -23,7 +23,8 @@ export default class Renderer extends Component {
     this.webgl = new WebGLRenderer();
     this.useNative(this.webgl.domElement);
 
-    this.webgl.setClearColor("#eeeeff");
+    // this.webgl.setClearColor("#eeeeff");
+    this.webgl.setClearColor("#262552");
     this.webgl.setSize(100, 100);
     this.scene = new Scene();
 

@@ -33,6 +33,10 @@ function getContentType(fname: string): string {
       return "application/wasm";
     case ".svg":
       return "image/svg+xml";
+    case ".glb":
+      return "model/gltf-binary";
+    case ".gltf":
+      return "model/gltf+json";
     default:
       console.log(fname, "unrecognized extension!");
       return "text/plain";

@@ -17,8 +17,8 @@ export default class API {
   private resourceManager: ResourceManager;
   private input: GameInput;
   static GameInput: typeof GameInput;
-  static THREE: any; //TODO
-  
+  static THREE: any;
+
   getInputManager (): GameInput {
     return this.input;
   }

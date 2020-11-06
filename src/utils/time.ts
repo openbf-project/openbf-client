@@ -4,7 +4,7 @@ export interface updateCallback {
 }
 
 export class TimeManager {
-  updateCallbacks: Set<updateCallback>;
+  private updateCallbacks: Set<updateCallback>;
   loop: boolean;
   intervalId: number = -1;
   fps: number;

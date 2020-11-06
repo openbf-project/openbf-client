@@ -1,6 +1,6 @@
 
-import { Scene, Object3D } from "../libs/three/Three.js";
-import { GLTFLoader } from "../libs/three-gltf/GLTFLoader.js";
+import { Scene, Object3D } from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 import API from "../api";
 const api: API = API.get();
@@ -10,7 +10,7 @@ const textDec = new TextDecoder();
 //This will be replaced by gltf-ts when it is ready
 const gltfLoader = new GLTFLoader();
 
-//Because babel is fucking stupid
+//package.json interpreted by babel from any folder.. have to use a different name
 const MODULE_DEF_JSON_NAME = "module.json";
 
 export class Resource {
@@ -56,7 +56,7 @@ export class ModelResource extends Resource {
 }
 
 export class ResourceManager {
-  resources: Map<string, Resource>;
+  private resources: Map<string, Resource>;
   resourceTransport: string = "http";
   resourceDomain: string = "localhost:8080";
   static SINGLETON: ResourceManager = undefined;
@@ -78,7 +78,7 @@ export class ResourceManager {
           let modName = name.substring(1, sepInd);
           name = name.substring(1 + sepInd);
           if (ModuleManager.get().hasModule(modName)) {
-            let mod = ModuleManager.get().loadedModules.get(modName);
+            let mod = ModuleManager.get().getLoadedModule(modName);
             name = `${mod.url}${name}`;
             break;
           } else {
@@ -146,6 +146,9 @@ export class ResourceManager {
       }
     });
   }
+  /**TODO - rename to getModelResource
+   * @param name 
+   */
   getResourceModel(name: string): Promise<ModelResource> {
     return new Promise(async (resolve, reject) => {
       let res = await this.getResource(name).catch(reject) as ModelResource;
@@ -193,7 +196,7 @@ export class ModuleManager {
   static MODULE_RESOURCE_PREFIX = "@";
   static MODULE_FETCH_PREFIX = "$";
   static SINGLETON: ModuleManager = undefined;
-  loadedModules: Map<string, Module>;
+  private loadedModules: Map<string, Module>;
   constructor() {
     if (!ModuleManager.SINGLETON) {
       ModuleManager.SINGLETON = this;
@@ -233,6 +236,9 @@ export class ModuleManager {
       mod.setModuleManager(this);
       mod.setResourceManager(ResourceManager.get());
     }
+  }
+  getLoadedModule (name: string): Module {
+    return this.loadedModules.get(name);
   }
   getModule(name: string): Promise<Module> {
     return new Promise(async (resolve, reject) => {
